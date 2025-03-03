@@ -1,0 +1,7 @@
+notebook/*
+.vscode
+result/*
+data/*
+__pycache__/*
+__pycache__
+fonts/*
