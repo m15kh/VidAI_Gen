@@ -8,7 +8,6 @@ def transcribe_with_api(
     """
     Transcribe an audio file using the OpenAI Whisper API
     """
-    print('transcribe_with_api is Running')
     transcript = openai.audio.transcriptions.create(
         model="whisper-1",
         file=open(audio_file, "rb"),
@@ -39,7 +38,6 @@ def transcribe_locally(
     (https://pypi.org/project/openai-whisper/)
     """
     import whisper
-    print("transcribe_locally is Running")
 
     model = whisper.load_model("base")
 

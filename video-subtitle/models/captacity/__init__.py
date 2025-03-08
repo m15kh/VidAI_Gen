@@ -195,7 +195,7 @@ def add_captions(
                 json.dump(segments, json_file)
                 
 
-        with open('/home/rteam2/m15kh/video-subtitle/notebook/auto-subtitle/auto_subtitle/captacity/captacity/localtest.json', 'r') as json_file:
+        with open('/home/rteam2/m15kh/auto-subtitle/test.json', 'r') as json_file:
             segments = json.load(json_file)
      
     if print_info:

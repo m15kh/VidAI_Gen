@@ -5,3 +5,6 @@ data/*
 __pycache__/*
 __pycache__
 fonts/*
+*.mp4
+*.json
+*.mp3
