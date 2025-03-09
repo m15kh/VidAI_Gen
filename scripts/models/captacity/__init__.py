@@ -7,6 +7,11 @@ import json
 from . import segment_parser
 from . import transcriber
 
+# Add imports for Arabic text support
+import arabic_reshaper
+from bidi.algorithm import get_display
+import re
+
 from .text_drawer import (
     get_text_size_ex,
     create_text_ex,
@@ -16,6 +21,30 @@ from .text_drawer import (
 
 shadow_cache = {}
 lines_cache = {}
+
+# Function to detect and process Arabic text
+def process_arabic_text(text):
+    # Check if the text contains Arabic characters
+    arabic_pattern = re.compile('[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]+')
+    if arabic_pattern.search(text):
+        # Reshape Arabic text
+        reshaped_text = arabic_reshaper.reshape(text)
+        # Handle bidirectional text
+        bidi_text = get_display(reshaped_text)
+        return bidi_text
+    return text
+
+# Modify the Word class to handle Arabic text
+def create_word_objects(text, highlight_color=None):
+    words = text.split()
+    word_list = []
+    for w in words:
+        w = process_arabic_text(w)
+        word_obj = Word(w)
+        if highlight_color:
+            word_obj.set_color(highlight_color)
+        word_list.append(word_obj)
+    return word_list
 
 def fits_frame(line_count, font, font_size, stroke_width, frame_width):
     def fit_function(text):
@@ -32,7 +61,10 @@ def fits_frame(line_count, font, font_size, stroke_width, frame_width):
 def calculate_lines(text, font, font_size, stroke_width, frame_width):
     global lines_cache
 
-    arg_hash = hash((text, font, font_size, stroke_width, frame_width))
+    # Process Arabic text if needed
+    processed_text = process_arabic_text(text)
+    
+    arg_hash = hash((processed_text, font, font_size, stroke_width, frame_width))
 
     if arg_hash in lines_cache:
         return lines_cache[arg_hash]
@@ -41,7 +73,7 @@ def calculate_lines(text, font, font_size, stroke_width, frame_width):
 
     line_to_draw = None
     line = ""
-    words = text.split()
+    words = processed_text.split()
     word_index = 0
     total_height = 0
     while word_index < len(words):
@@ -145,13 +177,10 @@ def add_captions(
     fit_function = None,
 
     padding = 50,
-    position = ("center", "center"), # TODO: Implement this
-
+    position = ("center", "center"),
     shadow_strength = 1.0,
     shadow_blur = 0.1,
-
     print_info = False,
-
     initial_prompt = None,
     segments = None,
 
@@ -205,6 +234,7 @@ def add_captions(
     video = VideoFileClip(video_file)
     text_bbox_width = video.w-padding*2
     clips = [video]
+    index = 0  # Define 'index' for tracking highlighted word
 
     captions = segment_parser.parse(
         segments=segments,
@@ -227,52 +257,50 @@ def add_captions(
                     end = word["end"]
 
                 captions_to_draw.append({
-                    "text": caption["text"],
+                    "text": process_arabic_text(caption["text"]),
                     "start": word["start"],
                     "end": end,
                 })
         else:
-            captions_to_draw.append(caption)
+            captions_to_draw.append({
+                "text": process_arabic_text(caption["text"]),
+                "start": caption["start"],
+                "end": caption["end"]
+            })
 
-        for current_index, caption in enumerate(captions_to_draw):
-            line_data = calculate_lines(caption["text"], font, font_size, stroke_width, text_bbox_width)
+        for current_index, subcaption in enumerate(captions_to_draw):
+            line_data = calculate_lines(subcaption["text"], font, font_size, stroke_width, text_bbox_width)
 
-            text_y_offset = video.h // 2 - line_data["height"] // 2
-            index = 0
-            for line in line_data["lines"]:
+            # Check if we're dealing with Arabic text
+            is_arabic = re.compile('[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]+').search(subcaption["text"])
+            
+            lines_to_render = line_data["lines"]
+
+            # Calculate total height
+            line_total_height = sum(line["height"] for line in lines_to_render)
+            text_y_offset = video.h // 2 - line_total_height // 2
+
+            # Reverse so the first entry in the list goes at the top
+            lines_to_render = lines_to_render[::-1]
+
+            for line in lines_to_render:
                 pos = ("center", text_y_offset)
 
-                words = line["text"].split()
-                word_list = []
-                for w in words:
-                    word_obj = Word(w)
-                    if highlight_current_word and index == current_index:
-                        word_obj.set_color(word_highlight_color)
-                    index += 1
-                    word_list.append(word_obj)
+                word_list = create_word_objects(
+                    line["text"], 
+                    word_highlight_color if highlight_current_word and index == current_index else None
+                )
+                index += len(line["text"].split())
 
-                # Create shadow
-                shadow_left = shadow_strength
-                while shadow_left >= 1:
-                    shadow_left -= 1
-                    shadow = create_shadow(line["text"], font_size, font, shadow_blur, opacity=1)
-                    shadow = shadow.set_start(caption["start"])
-                    shadow = shadow.set_duration(caption["end"] - caption["start"])
-                    shadow = shadow.set_position(pos)
-                    clips.append(shadow)
-
-                if shadow_left > 0:
-                    shadow = create_shadow(line["text"], font_size, font, shadow_blur, opacity=shadow_left)
-                    shadow = shadow.set_start(caption["start"])
-                    shadow = shadow.set_duration(caption["end"] - caption["start"])
-                    shadow = shadow.set_position(pos)
-                    clips.append(shadow)
-
-                # Create text
-                text = create_text_ex(word_list, font_size, font_color, font, stroke_color=stroke_color, stroke_width=stroke_width)
-                text = text.set_start(caption["start"])
-                text = text.set_duration(caption["end"] - caption["start"])
-                text = text.set_position(pos)
+                text = create_text_ex(
+                    word_list,
+                    font_size,
+                    font_color,
+                    font,
+                    stroke_color=stroke_color,
+                    stroke_width=stroke_width,
+                )
+                text = text.set_position(pos).set_start(subcaption["start"]).set_end(subcaption["end"])
                 clips.append(text)
 
                 text_y_offset += line["height"]

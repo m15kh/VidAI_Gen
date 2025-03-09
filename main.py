@@ -1,7 +1,7 @@
 import sys
 sys.path.append("..") 
 
-from models import captacity
+from scripts.models import captacity
 
 captacity.add_captions(
     video_file="/home/rteam2/m15kh/auto-subtitle/data/fa-tst4.mp4",
