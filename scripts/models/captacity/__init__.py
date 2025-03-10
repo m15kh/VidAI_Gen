@@ -35,13 +35,13 @@ def process_arabic_text(text):
     return text
 
 # Modify the Word class to handle Arabic text
-def create_word_objects(text, highlight_color=None):
+def create_word_objects(text, highlight_word=None, highlight_color=None):
     words = text.split()
     word_list = []
     for w in words:
         w = process_arabic_text(w)
         word_obj = Word(w)
-        if highlight_color:
+        if highlight_word is not None and highlight_word.lower() == w.lower():
             word_obj.set_color(highlight_color)
         word_list.append(word_obj)
     return word_list
