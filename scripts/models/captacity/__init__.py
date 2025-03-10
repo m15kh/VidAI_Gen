@@ -223,7 +223,7 @@ def add_captions(
             with open(subtitle_path, 'w') as json_file:
                 json.dump(segments, json_file)
                 
-
+        #LOG FOR TESTING
         with open('/home/rteam2/m15kh/auto-subtitle/test.json', 'r') as json_file:
             segments = json.load(json_file)
      
@@ -234,8 +234,9 @@ def add_captions(
     video = VideoFileClip(video_file)
     text_bbox_width = video.w-padding*2
     clips = [video]
-    index = 0  # Define 'index' for tracking highlighted word
-
+    
+    # Remove the incorrect index variable
+    
     captions = segment_parser.parse(
         segments=segments,
         fit_function=fit_function if fit_function else fits_frame(
@@ -260,12 +261,14 @@ def add_captions(
                     "text": process_arabic_text(caption["text"]),
                     "start": word["start"],
                     "end": end,
+                    "current_word": word["word"]  # Add the current word to highlight
                 })
         else:
             captions_to_draw.append({
                 "text": process_arabic_text(caption["text"]),
                 "start": caption["start"],
-                "end": caption["end"]
+                "end": caption["end"],
+                "current_word": None
             })
 
         for current_index, subcaption in enumerate(captions_to_draw):
@@ -286,11 +289,12 @@ def add_captions(
             for line in lines_to_render:
                 pos = ("center", text_y_offset)
 
+                # Pass the current word that should be highlighted
                 word_list = create_word_objects(
                     line["text"], 
-                    word_highlight_color if highlight_current_word and index == current_index else None
+                    subcaption["current_word"] if highlight_current_word else None,
+                    word_highlight_color
                 )
-                index += len(line["text"].split())
 
                 text = create_text_ex(
                     word_list,
