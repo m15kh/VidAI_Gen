@@ -35,8 +35,13 @@ def process_arabic_text(text):
     return text
 
 # Modify the Word class to handle Arabic text
-def create_word_objects(text, highlight_word=None, highlight_color=None):
+def create_word_objects(text, highlight_word=None, highlight_color=None): #FIXME THE BUG FOR COLOR OCCURS HERE
+    if highlight_word is not None:
+        highlight_word = highlight_word.strip() 
+
     words = text.split()
+    words = words[::-1]     #change sort of text for persian languages
+
     word_list = []
     for w in words:
         w = process_arabic_text(w)
@@ -247,7 +252,7 @@ def add_captions(
             text_bbox_width,
         ),
     )
-
+    #for  each text determine time currect word and in add in list of captions_to_draw
     for caption in captions:
         captions_to_draw = []
         if highlight_current_word:
@@ -261,7 +266,7 @@ def add_captions(
                     "text": process_arabic_text(caption["text"]),
                     "start": word["start"],
                     "end": end,
-                    "current_word": word["word"]  # Add the current word to highlight
+                    "current_word": process_arabic_text(word["word"])  # Add the current word to highlight
                 })
         else:
             captions_to_draw.append({
@@ -270,8 +275,8 @@ def add_captions(
                 "end": caption["end"],
                 "current_word": None
             })
-
-        for current_index, subcaption in enumerate(captions_to_draw):
+ 
+        for current_index, subcaption in enumerate(captions_to_draw): 
             line_data = calculate_lines(subcaption["text"], font, font_size, stroke_width, text_bbox_width)
 
             # Check if we're dealing with Arabic text
