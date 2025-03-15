@@ -275,22 +275,30 @@ def add_captions(
                 "end": caption["end"],
                 "current_word": None
             })
- 
+        
+    
+        # # Loop through all captions_to_draw and process each caption
+        for caption_item in captions_to_draw:
+            # Process Arabic/Persian text by reversing it
+            words = caption_item['text'].split(' ')[::-1]
+            caption_item['text'] = ' '.join(words)
+            
         for current_index, subcaption in enumerate(captions_to_draw): 
             line_data = calculate_lines(subcaption["text"], font, font_size, stroke_width, text_bbox_width)
-
-            # Check if we're dealing with Arabic text
-            is_arabic = re.compile('[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]+').search(subcaption["text"])
             
             lines_to_render = line_data["lines"]
+            # lines_to_render = lines_to_render[::-1] #change sort of text for persian languages up and down
 
             # Calculate total height
             line_total_height = sum(line["height"] for line in lines_to_render)
             text_y_offset = video.h // 2 - line_total_height // 2
 
             # Reverse so the first entry in the list goes at the top
-            lines_to_render = lines_to_render[::-1]
+         
+            #FIXME bug for reverse order here 
 
+
+            print("[LOG] ",lines_to_render)
             for line in lines_to_render:
                 pos = ("center", text_y_offset)
 
