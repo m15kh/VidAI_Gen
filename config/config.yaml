@@ -1,0 +1,26 @@
+video:
+  # Path to video file or URL
+  address: "/home/rteam2/m15kh/auto-subtitle/data/fa-tst4.mp4"
+  # Supported formats: mp4, mov, avi, etc.
+  format: "mp4"
+  
+subtitle:
+  # Path to subtitle file (optional)
+  model: "large"
+  # Supported formats: srt, vtt, etc.  
+# Processing options
+processing:
+  # Enable debug mode for verbose output
+  debug_mode: false
+  # Language settings for transcription
+  language: "en"
+  # Quality level (higher values = better quality but slower processing)
+  quality: "medium"  # options: low, medium, high
+
+# Output settings
+output:
+  # Subtitle file format
+  subtitle_format: "srt"
+
+debug_mode: True
+output_dir: /home/rteam2/m15kh/auto-subtitle/output

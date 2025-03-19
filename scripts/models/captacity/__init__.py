@@ -166,30 +166,24 @@ def detect_local_whisper(print_info):
 
 def add_captions(
     video_file,
-    output_file = "with_transcript.mp4",
-
-    font = "Bangers-Regular.ttf",
-    font_size = 130,
-    font_color = "yellow",
-
-    stroke_width = 3,
-    stroke_color = "black",
-
-    highlight_current_word = True,
-    word_highlight_color = "red",
-
-    line_count = 2,
-    fit_function = None,
-
-    padding = 50,
-    position = ("center", "center"),
-    shadow_strength = 1.0,
-    shadow_blur = 0.1,
-    print_info = False,
-    initial_prompt = None,
-    segments = None,
-
-    use_local_whisper = "auto",
+    output_dir,
+    font="Bangers-Regular.ttf",
+    font_size=130,
+    font_color="yellow",
+    stroke_width=3,
+    stroke_color="black",
+    highlight_current_word=True,
+    word_highlight_color="red",
+    line_count=2,
+    fit_function=None,
+    padding=50,
+    position=("center", "center"),
+    shadow_strength=1.0,
+    shadow_blur=0.1,
+    print_info=False,
+    initial_prompt=None,
+    segments=None,
+    use_local_whisper="auto",
 ):
     _start_time = time.time()
 
@@ -221,15 +215,16 @@ def add_captions(
             segments = transcriber.transcribe_with_api(temp_audio_file, initial_prompt)
 
         if print_info:
-            output_path = os.path.dirname(output_file)
             video_filename = os.path.splitext(os.path.basename(video_file))[0]
-            subtitle_path = os.path.join(output_path, f"{video_filename}_subtitle.json")
+            video_output_dir = os.path.join(output_dir, video_filename, "video")
+            os.makedirs(video_output_dir, exist_ok=True)
+            subtitle_path = os.path.join(video_output_dir, f"{video_filename}_subtitle.json")
             
             with open(subtitle_path, 'w') as json_file:
                 json.dump(segments, json_file)
                 
-        #LOG FOR TESTING
-        with open('/home/rteam2/m15kh/auto-subtitle/test.json', 'r') as json_file:
+        # LOG FOR TESTING
+        with open('/home/rteam2/m15kh/auto-subtitle/output/fa-tst4/video/fa-tst4_subtitle.json', 'r') as json_file:
             segments = json.load(json_file)
      
     if print_info:
@@ -237,7 +232,7 @@ def add_captions(
 
     # Open the video file
     video = VideoFileClip(video_file)
-    text_bbox_width = video.w-padding*2
+    text_bbox_width = video.w - padding * 2
     clips = [video]
     
     # Remove the incorrect index variable
@@ -252,13 +247,13 @@ def add_captions(
             text_bbox_width,
         ),
     )
-    #for  each text determine time currect word and in add in list of captions_to_draw
+    # For each text determine time current word and add in list of captions_to_draw
     for caption in captions:
         captions_to_draw = []
         if highlight_current_word:
             for i, word in enumerate(caption["words"]):
-                if i+1 < len(caption["words"]):
-                    end = caption["words"][i+1]["start"]
+                if i + 1 < len(caption["words"]):
+                    end = caption["words"][i + 1]["start"]
                 else:
                     end = word["end"]
 
@@ -276,8 +271,7 @@ def add_captions(
                 "current_word": None
             })
         
-    
-        # # Loop through all captions_to_draw and process each caption
+        # Loop through all captions_to_draw and process each caption
         for caption_item in captions_to_draw:
             # Process Arabic/Persian text by reversing it
             words = caption_item['text'].split(' ')[::-1]
@@ -287,18 +281,11 @@ def add_captions(
             line_data = calculate_lines(subcaption["text"], font, font_size, stroke_width, text_bbox_width)
             
             lines_to_render = line_data["lines"]
-            # lines_to_render = lines_to_render[::-1] #change sort of text for persian languages up and down
 
             # Calculate total height
             line_total_height = sum(line["height"] for line in lines_to_render)
             text_y_offset = video.h // 2 - line_total_height // 2
 
-            # Reverse so the first entry in the list goes at the top
-         
-            #FIXME bug for reverse order here 
-
-
-            print("[LOG] ",lines_to_render)
             for line in lines_to_render:
                 pos = ("center", text_y_offset)
 
@@ -332,6 +319,11 @@ def add_captions(
         print("Rendering video...")
 
     video_with_text = CompositeVideoClip(clips)
+
+    video_filename = os.path.splitext(os.path.basename(video_file))[0]
+    video_output_dir = os.path.join(output_dir, video_filename, "video")
+    os.makedirs(video_output_dir, exist_ok=True)
+    output_file = os.path.join(video_output_dir, "with_transcript.mp4")
 
     video_with_text.write_videofile(
         filename=output_file,

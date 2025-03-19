@@ -5,7 +5,7 @@ from scripts.models import captacity
 import os
 
 # Get input video path
-input_video = "/home/rteam2/m15kh/auto-subtitle/data/fa-tst4.mp4"
+input_video = "/home/rteam2/m15kh/auto-subtitle/data/tst2.mp4"
 # Extract just the filename without extension
 base_filename = os.path.splitext(os.path.basename(input_video))[0]
 # Specify output folder
@@ -17,7 +17,7 @@ output_path = os.path.join(output_folder, f"{base_filename}_captioned.mp4")
 
 captacity.add_captions(
     video_file=input_video,
-    output_file=output_path,
+    output_dir='/home/rteam2/m15kh/auto-subtitle/output',
     font = "/home/rteam2/.fonts/truetype/Vazir/vazirmatn-master/fonts/ttf/Vazirmatn-Black.ttf",
     # font="fonts/Bangers-Regular.ttf",
     font_size=50,

@@ -1,5 +1,26 @@
 #BUG
-    -COLOR OF EACH WORD IN THE TEXT IS NOT CHANGING
+
+    - COLOR OF EACH WORD IN THE TEXT IS NOT CHANGING #[x] 
+
 
 #FEATURE
-    -
+
+    - model for remove logo form other video and copy easily #[ ]
+
+
+#TODO
+
+    - add wisper and movipy to piprline #[ ]
+    - test lamfa model for persian and is lamda better or wisper which one is better? #[ ] link(https://github.com/YJ-20/auto-subtitle-translate)
+    - add logo to video and can moive #[ ]
+    - can user select language model for subtitle #[ ]
+    - can determine want remove subtitle first and after subitle or not #[ ]
+    - write pipleline for this project #[ ]
+    - write yaml file for this project #[ ]
+    - add debug varialbe to this project #[ ]
+    - add folder for youtube video and download video from youtube #[ ]
+    - determine video is from youtube ir you wana upload to telegram bot #[ ]
+    - add telegram bot to this project #[ ]
+    - determine font size and font type for subtitle in yaml #[ ]
+    - add logo to video and can moive in yaml #[ ]
+    - add progreess bar for wisper model
