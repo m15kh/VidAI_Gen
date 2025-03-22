@@ -22,6 +22,7 @@ def main():
     debugger = config['debug_mode']
     # Get the video path from the configuration file
     video_path = config['video']["address"]
+    subtitle_path = config['video']["subtitle"]
     model_subtitle = config['subtitle']['model']
     output_dir_path = config['output_dir']
 
@@ -39,15 +40,17 @@ def main():
 
         
     print("loading subtitle model ...")
-    subtitle, status = transcribe_video(video_path,output_dir_path,model_subtitle )
-    print("Subtitle generated successfully" if status else "Subtitle generation ****failed****")
+    # subtitle, status = transcribe_video(video_path,output_dir_path,model_subtitle )
+    # print("Subtitle generated successfully" if status else "Subtitle generation ****failed****")
     
     print("Adding captions to video ...")
     
     captacity.add_captions( #LOG
     video_file=video_path,
     output_dir=output_dir_path,
+    subtitle_path= subtitle_path,
     font = "/home/rteam2/.fonts/truetype/Vazir/vazirmatn-master/fonts/ttf/Vazirmatn-Black.ttf",
+    
     # font="fonts/Bangers-Regular.ttf",
     font_size=50,
     font_color="white",

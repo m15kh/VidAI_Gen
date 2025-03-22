@@ -28,6 +28,7 @@ class Word:
             char.set_color(color)
 
 class TextClipEx(TextClip):
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.text = kwargs["txt"]

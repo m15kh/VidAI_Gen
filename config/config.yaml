@@ -1,6 +1,7 @@
 video:
   # Path to video file or URL
-  address: "/home/rteam2/m15kh/auto-subtitle/data/fa-tst4.mp4"
+  address: "/home/rteam2/m15kh/auto-subtitle/notebook/auto-subtitle-translate/hub1.mp4"
+  subtitle: "/home/rteam2/m15kh/auto-subtitle/notebook/auto-subtitle-translate/newsss.json"
   # Supported formats: mp4, mov, avi, etc.
   format: "mp4"
   

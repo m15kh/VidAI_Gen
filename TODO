@@ -1,16 +1,28 @@
+#PRIORITY
+
+    - phase
+        1- works by short and video english video and just subtitle add logo too  #[ ]
+        2- works by persina video in youtube nad subtitle  #[ ]
+        3- change models to llama3 from llama2 #[ ] 
+        4- autimateclly upload on  instagram #[ ]
+        5- automateclly upload o youtube #[ ]
+
+
 #BUG
 
-    - COLOR OF EACH WORD IN THE TEXT IS NOT CHANGING #[x] 
+    - COLOR OF EACH WORD IN THE TEXT IS NOT CHANGING # [x] 
 
 
 #FEATURE
 
     - model for remove logo form other video and copy easily #[ ]
-
+    - for increase quility of subtitle for persian video on vide in that coloberate auti subtutle youtube by lambda  #[ ] 
+    - highlight word has background color #[ ]
+    - for persian srt do it much pretty for showing subtitle same as english #[ ] 
 
 #TODO
 
-    - add wisper and movipy to piprline #[ ]
+    - add wisper and movipy to piprline #[ ]  
     - test lamfa model for persian and is lamda better or wisper which one is better? #[ ] link(https://github.com/YJ-20/auto-subtitle-translate)
     - add logo to video and can moive #[ ]
     - can user select language model for subtitle #[ ]
@@ -24,3 +36,6 @@
     - determine font size and font type for subtitle in yaml #[ ]
     - add logo to video and can moive in yaml #[ ]
     - add progreess bar for wisper model
+    - in yaml we must determine the video in english or persian  #[ ]  priority works by short emglish
+    - in yanl we must dermine is it short video or a specifiv part of video #[ ]
+

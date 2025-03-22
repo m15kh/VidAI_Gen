@@ -5,7 +5,6 @@ import time
 import os
 import json
 from . import segment_parser
-from . import transcriber
 
 # Add imports for Arabic text support
 import arabic_reshaper
@@ -36,19 +35,27 @@ def process_arabic_text(text):
 
 # Modify the Word class to handle Arabic text
 def create_word_objects(text, highlight_word=None, highlight_color=None): #FIXME THE BUG FOR COLOR OCCURS HERE
-    if highlight_word is not None:
-        highlight_word = highlight_word.strip() 
+    occurrence_map = {}
+    if highlight_word:
+        highlight_word = highlight_word.strip().lower()
 
-    words = text.split()
-    words = words[::-1]     #change sort of text for persian languages
-
+    words = text.split()[::-1]  # Reverse for Persian languages
     word_list = []
+
     for w in words:
-        w = process_arabic_text(w)
-        word_obj = Word(w)
-        if highlight_word is not None and highlight_word.lower() == w.lower():
+        w_processed = process_arabic_text(w)
+        w_lower = w_processed.lower()
+
+        if w_lower not in occurrence_map:
+            occurrence_map[w_lower] = 0
+        occurrence_map[w_lower] += 1
+
+        word_obj = Word(w_processed)
+        if highlight_word and highlight_word == w_lower and occurrence_map[w_lower] == 1:
             word_obj.set_color(highlight_color)
+
         word_list.append(word_obj)
+
     return word_list
 
 def fits_frame(line_count, font, font_size, stroke_width, frame_width):
@@ -151,22 +158,23 @@ def get_font_path(font):
 
     return font
 
-def detect_local_whisper(print_info):
-    try:
-        import whisper
-        use_local_whisper = True
-        if print_info:
-            print("Using local whisper model...")
-    except ImportError:
-        use_local_whisper = False
-        if print_info:
-            print("Using OpenAI Whisper API...")
+# def detect_local_whisper(print_info):
+#     try:
+#         import whisper
+#         use_local_whisper = True
+#         if print_info:
+#             print("Using local whisper model...")
+#     except ImportError:
+#         use_local_whisper = False
+#         if print_info:
+#             print("Using OpenAI Whisper API...")
 
-    return use_local_whisper
+#     return use_local_whisper
 
 def add_captions(
     video_file,
     output_dir,
+    subtitle_path,
     font="Bangers-Regular.ttf",
     font_size=130,
     font_color="yellow",
@@ -174,7 +182,7 @@ def add_captions(
     stroke_color="black",
     highlight_current_word=True,
     word_highlight_color="red",
-    line_count=2,
+    line_count=1,
     fit_function=None,
     padding=50,
     position=("center", "center"),
@@ -182,51 +190,15 @@ def add_captions(
     shadow_blur=0.1,
     print_info=False,
     initial_prompt=None,
-    segments=None,
-    use_local_whisper="auto",
 ):
     _start_time = time.time()
 
     font = get_font_path(font)
 
-    if print_info:
-        print("Extracting audio...")
-
-    temp_audio_file = tempfile.NamedTemporaryFile(suffix=".wav").name
-    ffmpeg([
-        'ffmpeg',
-        '-y',
-        '-i', video_file,
-        temp_audio_file
-    ])
-
-    if segments is None:
-        if print_info:
-            print("Transcribing audio...")
-
-        if use_local_whisper == "auto":
-            use_local_whisper = detect_local_whisper(print_info)
-
-        if use_local_whisper:
-            segments = transcriber.transcribe_locally(temp_audio_file, initial_prompt)
-            print("-----------------------------")
-            print(segments)
-        else:
-            segments = transcriber.transcribe_with_api(temp_audio_file, initial_prompt)
-
-        if print_info:
-            video_filename = os.path.splitext(os.path.basename(video_file))[0]
-            video_output_dir = os.path.join(output_dir, video_filename, "video")
-            os.makedirs(video_output_dir, exist_ok=True)
-            subtitle_path = os.path.join(video_output_dir, f"{video_filename}_subtitle.json")
-            
-            with open(subtitle_path, 'w') as json_file:
-                json.dump(segments, json_file)
-                
-        # LOG FOR TESTING
-        with open('/home/rteam2/m15kh/auto-subtitle/output/fa-tst4/video/fa-tst4_subtitle.json', 'r') as json_file:
+    #read subtitle path
+    with open(subtitle_path, 'r') as json_file:
             segments = json.load(json_file)
-     
+            
     if print_info:
         print("Generating video elements...")
 
