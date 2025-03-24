@@ -1,27 +1,23 @@
-video:
-  # Path to video file or URL
-  address: "/home/rteam2/m15kh/auto-subtitle/notebook/auto-subtitle-translate/hub1.mp4"
-  subtitle: "/home/rteam2/m15kh/auto-subtitle/notebook/auto-subtitle-translate/newsss.json"
-  # Supported formats: mp4, mov, avi, etc.
-  format: "mp4"
-  
-subtitle:
-  # Path to subtitle file (optional)
-  model: "large"
-  # Supported formats: srt, vtt, etc.  
-# Processing options
-processing:
-  # Enable debug mode for verbose output
-  debug_mode: false
-  # Language settings for transcription
-  language: "en"
-  # Quality level (higher values = better quality but slower processing)
-  quality: "medium"  # options: low, medium, high
-
-# Output settings
-output:
-  # Subtitle file format
-  subtitle_format: "srt"
-
+# Video paths to transcribe (required)
+video_path: "/home/rteam2/m15kh/auto-subtitle/data/time.mp4"
+# subtitle_path: "/home/rteam2/m15kh/auto-subtitle/subtitled/time/subtitle/time.json" #if None, it will be saved in the same directory as the video
+subtitle_path: null
+output_dir: "subtitled"
 debug_mode: True
-output_dir: /home/rteam2/m15kh/auto-subtitle/output
+
+
+process_subtitle:
+# Whisper model options
+  model: "large"  # Choices: tiny, base, small, medium, large
+  # Output options
+  verbose: false
+  # Language processing
+  task: "transcribe"  # Choices: transcribe, translate
+  language: "en"  # Source language (auto for automatic detection)
+  translate_to: null
+
+
+
+video_editor:
+
+

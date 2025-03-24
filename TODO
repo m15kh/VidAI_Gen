@@ -10,7 +10,9 @@
 
 #BUG
 
-    - COLOR OF EACH WORD IN THE TEXT IS NOT CHANGING # [x] 
+    - COLOR OF EACH WORD IN THE TEXT IS NOT CHANGING #[x] 
+    - for english subtlte is reverse #[ ]
+    - for more than 1 lines of english reverse subtitle! #[ ]
 
 
 #FEATURE
@@ -19,11 +21,12 @@
     - for increase quility of subtitle for persian video on vide in that coloberate auti subtutle youtube by lambda  #[ ] 
     - highlight word has background color #[ ]
     - for persian srt do it much pretty for showing subtitle same as english #[ ] 
+    - when you edit subtitle in bot telegram you can determine which word have diffrent color #[ ]
 
 #TODO
 
-    - add wisper and movipy to piprline #[ ]  
-    - test lamfa model for persian and is lamda better or wisper which one is better? #[ ] link(https://github.com/YJ-20/auto-subtitle-translate)
+    - add wisper and movipy to piprline #[x]  
+    - test lamfa model for persian and is lamda better or wisper which one is better? #[x] link(https://github.com/YJ-20/auto-subtitle-translate)
     - add logo to video and can moive #[ ]
     - can user select language model for subtitle #[ ]
     - can determine want remove subtitle first and after subitle or not #[ ]
@@ -35,7 +38,7 @@
     - add telegram bot to this project #[ ]
     - determine font size and font type for subtitle in yaml #[ ]
     - add logo to video and can moive in yaml #[ ]
-    - add progreess bar for wisper model
+    - add progreess bar for wisper model #[ ]
     - in yaml we must determine the video in english or persian  #[ ]  priority works by short emglish
     - in yanl we must dermine is it short video or a specifiv part of video #[ ]
-
+    - in bot sent srt foramt and you edit and after create video #[ ]

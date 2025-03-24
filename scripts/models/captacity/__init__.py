@@ -5,7 +5,7 @@ import time
 import os
 import json
 from . import segment_parser
-
+from SmartAITool.core import cprint
 # Add imports for Arabic text support
 import arabic_reshaper
 from bidi.algorithm import get_display
@@ -174,7 +174,7 @@ def get_font_path(font):
 def add_captions(
     video_file,
     output_dir,
-    subtitle_path,
+    subtitle,
     font="Bangers-Regular.ttf",
     font_size=130,
     font_color="yellow",
@@ -185,7 +185,7 @@ def add_captions(
     line_count=1,
     fit_function=None,
     padding=50,
-    position=("center", "center"),
+    position=("center", "bottom"),  # Changed default to center-bottom
     shadow_strength=1.0,
     shadow_blur=0.1,
     print_info=False,
@@ -195,22 +195,17 @@ def add_captions(
 
     font = get_font_path(font)
 
-    #read subtitle path
-    with open(subtitle_path, 'r') as json_file:
-            segments = json.load(json_file)
             
     if print_info:
-        print("Generating video elements...")
+        cprint("Generating video elements...", 'yellow')
 
     # Open the video file
     video = VideoFileClip(video_file)
     text_bbox_width = video.w - padding * 2
     clips = [video]
     
-    # Remove the incorrect index variable
-    
     captions = segment_parser.parse(
-        segments=segments,
+        segments=subtitle,
         fit_function=fit_function if fit_function else fits_frame(
             line_count,
             font,
@@ -256,10 +251,28 @@ def add_captions(
 
             # Calculate total height
             line_total_height = sum(line["height"] for line in lines_to_render)
-            text_y_offset = video.h // 2 - line_total_height // 2
+            
+            # Set position based on the position parameter
+            x_pos, y_pos = position
+            
+            # Handle horizontal position
+            if x_pos == "left":
+                x_position = padding
+            elif x_pos == "right":
+                x_position = video.w - padding
+            else:  # center or default
+                x_position = "center"
+                
+            # Handle vertical position
+            if y_pos == "top":
+                text_y_offset = padding
+            elif y_pos == "bottom":
+                text_y_offset = video.h - line_total_height - padding
+            else:  # center or default
+                text_y_offset = video.h // 2 - line_total_height // 2
 
             for line in lines_to_render:
-                pos = ("center", text_y_offset)
+                pos = (x_position, text_y_offset)
 
                 # Pass the current word that should be highlighted
                 word_list = create_word_objects(
@@ -292,10 +305,11 @@ def add_captions(
 
     video_with_text = CompositeVideoClip(clips)
 
+# BUG remove the following code
     video_filename = os.path.splitext(os.path.basename(video_file))[0]
     video_output_dir = os.path.join(output_dir, video_filename, "video")
     os.makedirs(video_output_dir, exist_ok=True)
-    output_file = os.path.join(video_output_dir, "with_transcript.mp4")
+    output_file = os.path.join(video_output_dir, f"sub_{video_filename}.mp4")
 
     video_with_text.write_videofile(
         filename=output_file,
