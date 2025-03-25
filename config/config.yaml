@@ -6,6 +6,37 @@ output_dir: "subtitled"
 debug_mode: True
 
 
+
+youtube:
+  url: "https://www.youtube.com/shorts/S0pYBB8uB20?feature=share"
+  quality: "best"  # Options: "best", "worst", or format code like "137+140"
+  resolution: "1080p"  # Options: "240p", "360p", "480p", "720p", "1080p", etc. 
+                       # Note: For Shorts, resolution is automatically determined for best compatibility
+  download_full: True  # Set to true to download the full video, false to use segments
+  video_type: "regular"  # Options: "short" or "regular" - manually specify video type
+  
+  # Filename format configuration
+  filename_format:
+    use_counter: True    # Include a sequential number in filenames
+    use_channel: True    # Include channel name in filenames 
+    prefix: ""           # Optional prefix before the counter
+  
+  segments:
+    - time:
+        start: "00:23:01"  # Format: HH:MM:SS
+        end: "00:23:30"
+      aspect_ratio:
+        mode: "scale"  # Using the new scale mode (adds black bars for regular videos)
+        ratio: "9:16"  # Common values: "16:9" (landscape), "9:16" (portrait/shorts)
+        
+  output:
+    directory: "./downloads"  # Directory where videos will be saved
+    filename: null            # Set to null to use auto-generated filenames with counter and channel
+    merge: true               # Whether to merge all segments into single video
+
+
+
+
 process_subtitle:
 # Whisper model options
   model: "large"  # Choices: tiny, base, small, medium, large

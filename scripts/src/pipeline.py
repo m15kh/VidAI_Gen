@@ -6,7 +6,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'
 
 from SmartAITool.core import cprint
 from scripts.models.captacity import add_captions
-from scripts.src.pipeline_subtitle import generate_subtitle
+from scripts.models.subtitle.main import generate_subtitle
 
 
 def load_yaml_config(file_path):

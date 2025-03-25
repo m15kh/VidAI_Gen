@@ -22,6 +22,7 @@
     - highlight word has background color #[ ]
     - for persian srt do it much pretty for showing subtitle same as english #[ ] 
     - when you edit subtitle in bot telegram you can determine which word have diffrent color #[ ]
+    - you jave title of youtube video so you can generate text with it  by llm for discrption and other things #[ ]
 
 #TODO
 
