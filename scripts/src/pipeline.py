@@ -2,29 +2,28 @@ import yaml
 import sys
 import os
 import json
+from time import time
+
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))) # Add the parent directory of the 'models' folder to the system path
 
-from SmartAITool.core import cprint
+from SmartAITool.core import *
 from scripts.models.captacity import add_captions
 from scripts.models.subtitle.main import generate_subtitle
+from scripts.models.youtube.downloader import youtube_downloader
 
-
-def load_yaml_config(file_path):
-    #read the yaml file
-    with open(file_path, 'r') as file:
-        config = yaml.safe_load(file)
-    return config
-
-def main():
-    # Load the configuration file
-    config = load_yaml_config("/home/rteam2/m15kh/auto-subtitle/config/config.yaml")
+def load_general_config(config):   
+    
     debugger = config['debug_mode']
     video_path = config["video_path"]
     subtitle_path = config["subtitle_path"]
     output_dir_path = config['output_dir']
+        
+        
+    return debugger, video_path, subtitle_path, output_dir_path
 
-
-    #CONFIG file for subtitle model
+def load_subtitle_config(config):
+     
     model_name = config["process_subtitle"].get("model", "large")
     language = config["process_subtitle"].get("language", "auto")
     translate_to = config["process_subtitle"].get("translate_to", None)
@@ -33,28 +32,45 @@ def main():
         "verbose": config["process_subtitle"].get("verbose", False),
         "language": None  # Default to None, will be set later if needed
     }
+    return model_name, language, translate_to, args
     
-    if debugger:
-        cprint("the debug-mode is: ON", "red")
+
+    
+def main(config):
+    #Load the configuration file [MAIN]
+    debugger, video_path, subtitle_path, output_dir_path = load_general_config(config)
+    
+    cprint(f"the debug-mode is: {'ON' if debugger else 'OFF'}", "red" if debugger else "green")
+
+    if video_path.startswith("http://") or video_path.startswith("https://"):
+        cprint("[PIPELINE 1] downloading the video ...", "magenta")
     else:
-        cprint("the debug-mode is: OFF", "green")
+        cprint("The video path is an MP4 file [SKIP [PIPELINE 1]]", "red")
+
+    
+    # ---------------------[PIPELINE 1](download videos)----------------------
+  
+    download_video_path = youtube_downloader(config)
+    
+    
+
+    # ---------------------[PIPELINE 2](process subtitle)---------------------
+    model_name, language, translate_to, args = load_subtitle_config(config)
 
 
     if subtitle_path == None:
-           cprint("loading subtitle model ...", "green")
-           subtitle = generate_subtitle(video_path, output_dir_path, model_name, language, translate_to, args)
-
+           cprint("[PIPELINE 2] loading subtitle model ...", "magenta")
+           subtitle = generate_subtitle(download_video_path, output_dir_path, model_name, language, translate_to, args)
     else:
-        cprint("subtitle path is provided", "red")
+        cprint("subtitle path is provided [SKIP [PIPELINE 2]]", "red")
         with open(subtitle_path, 'r') as file:
             subtitle = json.load(file)
             
             
             
-    cprint("editing video ...", "yellow")
+    cprint("[PIPELINE 3] editing video ...", "magenta")
     add_captions(
-        video_file=video_path,
-        output_dir=output_dir_path,
+        download_video_path=download_video_path,
         subtitle= subtitle,
         font = "/home/rteam2/.fonts/truetype/Vazir/vazirmatn-master/fonts/ttf/Vazirmatn-Black.ttf",
         font_size=50,
@@ -72,6 +88,14 @@ def main():
     )
     
 if __name__ == "__main__":
-    main()
     
-    cprint("video edited successfully", "green")
+    cprint("pipeline is running ...", "blue")
+    
+    start_time = time()
+    with open("/home/rteam2/m15kh/auto-subtitle/config/config.yaml", 'r') as file:
+        config = yaml.safe_load(file)
+        
+    main(config)
+    end_time = time()
+    execution_time = end_time - start_time
+    cprint(f"pipeline finished successfully in {execution_time:.2f} seconds", "blue")

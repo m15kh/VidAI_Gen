@@ -7,7 +7,7 @@ from auto_subtitle_llama.llama import *
 from SmartAITool.core import cprint, bprint
 
 
-def generate_subtitle(video_path, output_dir_path, model_name, language, translate_to, args):
+def generate_subtitle(download_video_path, output_dir_path, model_name, language, translate_to, args):
     """
     Generate subtitles for video files
     
@@ -20,23 +20,19 @@ def generate_subtitle(video_path, output_dir_path, model_name, language, transla
         args (dict): Additional arguments
     """
     # Validate video paths
-    if not video_path:
+    if not download_video_path:
         cprint("Error: No video paths provided", "red")
         return
 
     # Ensure video_path is a list
-    if not isinstance(video_path, list):
-        video_path = [video_path]
+    if not isinstance(download_video_path, list):
+        download_video_path = [download_video_path]
 
-    for path in video_path:
+    for path in download_video_path:
         if not os.path.exists(path):
             cprint(f"Error: Video file not found: {path}", "red")
             return
 
-    # Create output directory for the first video
-    video_filename = os.path.splitext(os.path.basename(video_path[0]))[0]
-    video_output_dir = os.path.join(output_dir_path, video_filename, "video")
-    os.makedirs(video_output_dir, exist_ok=True)
 
     if model_name.endswith(".en"):
         warnings.warn(
@@ -47,20 +43,19 @@ def generate_subtitle(video_path, output_dir_path, model_name, language, transla
         # Convert language code to Whisper format
         args["language"] = convert_language_code(language)
     
-    bprint("Loading Whisper model")
+    print("Loading Whisper model")
     model = whisper.load_model(model_name)
     
-    bprint("Extracting audio from video")
-    audios = get_audio(video_path)
+    print("Extracting audio from video")
+    audios = get_audio(download_video_path)
     
-    bprint("Generating subtitles")
+    print("Generating subtitles")
     pretty_subtitle = get_subtitles( #if you wanna add subtitle to video with local model uncomment  a below code 
         audios, 
-        output_dir_path, 
+        download_video_path[0], 
         model,
         args, 
         translate_to=translate_to,
-        video_path=video_path[0]
     )
     
     return pretty_subtitle

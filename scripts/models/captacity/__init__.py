@@ -172,8 +172,7 @@ def get_font_path(font):
 #     return use_local_whisper
 
 def add_captions(
-    video_file,
-    output_dir,
+    download_video_path,
     subtitle,
     font="Bangers-Regular.ttf",
     font_size=130,
@@ -197,10 +196,10 @@ def add_captions(
 
             
     if print_info:
-        cprint("Generating video elements...", 'yellow')
+        print("Generating video elements")
 
     # Open the video file
-    video = VideoFileClip(video_file)
+    video = VideoFileClip(download_video_path)
     text_bbox_width = video.w - padding * 2
     clips = [video]
     
@@ -306,10 +305,13 @@ def add_captions(
     video_with_text = CompositeVideoClip(clips)
 
 # BUG remove the following code
-    video_filename = os.path.splitext(os.path.basename(video_file))[0]
-    video_output_dir = os.path.join(output_dir, video_filename, "video")
-    os.makedirs(video_output_dir, exist_ok=True)
-    output_file = os.path.join(video_output_dir, f"sub_{video_filename}.mp4")
+    video_filename = os.path.splitext(os.path.basename(download_video_path))[0]
+
+    base_dir = os.path.dirname(os.path.dirname(download_video_path))  # Gets output/youtube/11_youtube_Motivate_me
+    final_video_dir = os.path.join(base_dir, "final_video") 
+    os.makedirs(final_video_dir, exist_ok=True)
+
+    output_file = os.path.join(final_video_dir, f"sub_{video_filename}.mp4")
 
     video_with_text.write_videofile(
         filename=output_file,

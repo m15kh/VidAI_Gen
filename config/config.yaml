@@ -1,26 +1,24 @@
-# Video paths to transcribe (required)
-video_path: "/home/rteam2/m15kh/auto-subtitle/data/time.mp4"
-# subtitle_path: "/home/rteam2/m15kh/auto-subtitle/subtitled/time/subtitle/time.json" #if None, it will be saved in the same directory as the video
-subtitle_path: null
-output_dir: "subtitled"
+#-----------------------------------MAIN-----------------------------------
+video_path: "/home/rteam2/m15kh/auto-subtitle/output/youtube/11_youtube_Motivate_me/download/Winners_and_Losers_Mindset__Andrew_Huberman.mp4"
+subtitle_path: null # if you want to use subtitle file, set the path
+output_dir: "output"
 debug_mode: True
 
-
-
+#-----------------------------------youtube-----------------------------------
 youtube:
-  url: "https://www.youtube.com/shorts/S0pYBB8uB20?feature=share"
+  url: "https://youtube.com/shorts/kJ23zVr3HkE?si=M1O4CTvycVwbnZwR"
   quality: "best"  # Options: "best", "worst", or format code like "137+140"
   resolution: "1080p"  # Options: "240p", "360p", "480p", "720p", "1080p", etc. 
-                       # Note: For Shorts, resolution is automatically determined for best compatibility
+                        # Note: For Shorts, resolution is automatically determined for best compatibility
   download_full: True  # Set to true to download the full video, false to use segments
   video_type: "regular"  # Options: "short" or "regular" - manually specify video type
-  
+
   # Filename format configuration
   filename_format:
     use_counter: True    # Include a sequential number in filenames
     use_channel: True    # Include channel name in filenames 
     prefix: ""           # Optional prefix before the counter
-  
+
   segments:
     - time:
         start: "00:23:01"  # Format: HH:MM:SS
@@ -28,27 +26,30 @@ youtube:
       aspect_ratio:
         mode: "scale"  # Using the new scale mode (adds black bars for regular videos)
         ratio: "9:16"  # Common values: "16:9" (landscape), "9:16" (portrait/shorts)
-        
+
   output:
-    directory: "./downloads"  # Directory where videos will be saved
     filename: null            # Set to null to use auto-generated filenames with counter and channel
     merge: true               # Whether to merge all segments into single video
 
-
-
-
+#-----------------------------------subtitle-----------------------------------
 process_subtitle:
-# Whisper model options
-  model: "large"  # Choices: tiny, base, small, medium, large
-  # Output options
-  verbose: false
-  # Language processing
-  task: "transcribe"  # Choices: transcribe, translate
-  language: "en"  # Source language (auto for automatic detection)
-  translate_to: null
+  # Whisper model options
+    model: "large"  # Choices: tiny, base, small, medium, large
+    # Output options
+    verbose: false
+    # Language processing
+    task: "translate"  # Choices: transcribe, translate
+    language: "en"  # Source language (auto for automatic detection)
+    translate_to: 'fa_IR'   #'fa_IR'  #null for no translation
 
 
-
+#-----------------------------------video_editor-----------------------------------
 video_editor:
 
+
+
+#-----------------------------------internal-----------------------------------
+#NOTE : Do not change these values
+internal:
+  path_download_video: 
 

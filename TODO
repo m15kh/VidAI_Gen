@@ -12,8 +12,7 @@
 #BUG
 
     - COLOR OF EACH WORD IN THE TEXT IS NOT CHANGING #[x] 
-    - for english subtlte is reverse #[ ]
-    - for more than 1 lines of english reverse subtitle! #[ ]
+    - for more than 1 lines of english reverse subtitle #[ ]
 
 
 #FEATURE
@@ -24,6 +23,9 @@
     - for persian srt do it much pretty for showing subtitle same as english #[ ] 
     - when you edit subtitle in bot telegram you can determine which word have diffrent color #[ ]
     - you jave title of youtube video so you can generate text with it  by llm for discrption and other things #[ ]
+    - set random logo posion in video #[ ]
+    - merge video with final part video with effect #[ ]
+    - download sounf behind video and using sounf for subtitle and other pipeline for increase speed #[ ]
 
 #TODO
 

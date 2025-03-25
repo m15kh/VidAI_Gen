@@ -1,17 +1,13 @@
 import yaml
 import subprocess
 import os
-import argparse
 import re
 import tempfile
 import shutil
 import json
 from pathlib import Path
 
-def load_config(config_path):
-    """Load YAML configuration file."""
-    with open(config_path, 'r') as file:
-        return yaml.safe_load(file)
+
 
 def is_short_video(url):
     """Detect if URL is for a YouTube Short."""
@@ -80,69 +76,126 @@ def get_next_counter(counter_file=None):
 
 def create_nested_folder_structure(output_base_dir, counter, channel_name):
     """Create a nested folder structure for the downloaded video."""
-    # Create main folder name with counter, youtube, and channel name
-    main_folder_name = f"{counter}_youtube_{channel_name}"
-    main_folder_path = os.path.join(output_base_dir, main_folder_name)
+    # First create a youtube folder inside the output directory
+    youtube_folder_path = os.path.join(output_base_dir, "youtube")
+    Path(youtube_folder_path).mkdir(parents=True, exist_ok=True)
     
-    # Create youtube subfolder
-    youtube_folder_path = os.path.join(main_folder_path, "youtube")
+    # Create main folder name with counter, youtube, and channel name inside the youtube folder
+    main_folder_name = f"{counter}_youtube_{channel_name}"
+    main_folder_path = os.path.join(youtube_folder_path, main_folder_name)
+    
+    # Create download subfolder inside the main folder
+    download_folder_path = os.path.join(main_folder_path, "download")
     
     # Create both folders
     Path(main_folder_path).mkdir(parents=True, exist_ok=True)
-    Path(youtube_folder_path).mkdir(parents=True, exist_ok=True)
+    Path(download_folder_path).mkdir(parents=True, exist_ok=True)
     
     return {
+        "youtube_folder": youtube_folder_path,
         "main_folder": main_folder_path,
-        "youtube_folder": youtube_folder_path
+        "download_folder": download_folder_path
     }
+
+def read_youtube_config(config):
+    """
+    Extract all YouTube configuration parameters from the config dict.
+    Returns a structured dictionary with all needed parameters.
+    """
+    youtube_config = {
+        # Basic video parameters
+        'url': config['youtube'].get('url', ''),
+        'quality': config['youtube'].get('quality', 'best'),
+        'resolution': config['youtube'].get('resolution', None),
+        'download_full': config['youtube'].get('download_full', False),
+        'video_type': config['youtube'].get('video_type', None),
+        
+        # Filename format settings
+        'filename_format': {
+            'use_counter': config['youtube'].get('filename_format', {}).get('use_counter', True),
+            'use_channel': config['youtube'].get('filename_format', {}).get('use_channel', True),
+            'prefix': config['youtube'].get('filename_format', {}).get('prefix', ''),
+            'use_nested_folders': config['youtube'].get('filename_format', {}).get('use_nested_folders', True),
+        },
+        
+        # Output parameters
+        'output_dir': config.get('output_dir', './output'),
+        'output': {
+            'filename': config['youtube']['output'].get('filename', None) if 'output' in config['youtube'] else None,
+            'merge': config['youtube']['output'].get('merge', True) if 'output' in config['youtube'] else True,
+        },
+        
+        # Segments for partial download
+        'segments': config['youtube'].get('segments', [])
+    }
+    
+    # For backward compatibility with old format
+    if 'time' in config['youtube']:
+        youtube_config['time'] = config['youtube'].get('time', {})
+    if 'aspect_ratio' in config['youtube']:
+        youtube_config['aspect_ratio'] = config['youtube'].get('aspect_ratio', {})
+    
+    return youtube_config
 
 def download_video(config):
     """Download video segments using yt-dlp with the specified configuration."""
-    # Extract common parameters from config
-    url = config['youtube']['url']
-    quality = config['youtube'].get('quality', 'best')
-    resolution = config['youtube'].get('resolution', None)
-    download_full = config['youtube'].get('download_full', False)  # Get download_full parameter
-    manual_video_type = config['youtube'].get('video_type', None)  # Get manual video type if specified
+    # Extract all needed parameters from the config
+    params = read_youtube_config(config)
+    
+    # Extract common parameters from the parsed config
+    url = params['url']
+    quality = params['quality']
+    resolution = params['resolution']
+    download_full = params['download_full']
+    manual_video_type = params['video_type']
+    
     # Get filename format settings
-    filename_format = config['youtube'].get('filename_format', {})
-    use_counter = filename_format.get('use_counter', True)
-    use_channel = filename_format.get('use_channel', True)
-    custom_prefix = filename_format.get('prefix', '')
-    use_nested_folders = filename_format.get('use_nested_folders', True)
+    filename_format = params['filename_format']
+    use_counter = filename_format['use_counter']
+    use_channel = filename_format['use_channel']
+    custom_prefix = filename_format['prefix']
+    use_nested_folders = filename_format['use_nested_folders']
+    
     # Output parameters
-    output_dir = config['youtube']['output'].get('directory', './downloads')
-    base_filename = config['youtube']['output'].get('filename', None)
-    should_merge = config['youtube']['output'].get('merge', True)  # Default to True if not specified
+    output_dir = params['output_dir']
+    base_filename = params['output']['filename']
+    should_merge = params['output']['merge']
+    
+    
     # If custom filename formatting is enabled and no base_filename is provided
     if not base_filename and (use_counter or use_channel):
         # The actual filename will be generated in download_segment
         base_filename = None
+        
     # If nested folder structure is enabled, set base_filename to None
     # to use our custom folder structure
     if use_nested_folders:
         base_filename = None
+        
     # Create output directory if it doesn't exist
     Path(output_dir).mkdir(parents=True, exist_ok=True)
+    
     # Check if we want to download the full video
     if download_full:
         print("\n==== Downloading Full Video ====")
         # Create a segment with no time constraints but with aspect ratio settings
         aspect_config = {}
+        
         # For full video downloads, get aspect ratio from first segment if available
-        if 'segments' in config['youtube'] and config['youtube']['segments']:
-            aspect_config = config['youtube']['segments'][0].get('aspect_ratio', {})
+        if params['segments']:
+            aspect_config = params['segments'][0].get('aspect_ratio', {})
         
         segment = {
             'aspect_ratio': aspect_config
         }
         
         # Download the full video
-        download_segment(url, segment, quality, resolution, output_dir, base_filename, manual_video_type)
-        return
+        result = download_segment(url, segment, quality, resolution, output_dir, base_filename, manual_video_type)
+        return result
+        
     # Handle segments if not downloading full video
-    if 'segments' in config['youtube']:
-        segments = config['youtube']['segments']
+    if params['segments']:
+        segments = params['segments']
         print(f"Processing {len(segments)} video segments")
         
         segment_files = []
@@ -178,18 +231,22 @@ def download_video(config):
             if success:
                 print(f"Final video saved to: {final_output}")
                 shutil.rmtree(segments_dir)
+                return final_output
             else:
                 print("Merging failed. Segment files are preserved in the temporary directory.")
                 print(f"Temporary directory: {segments_dir}")
+                return None
         elif segment_files and not should_merge:
             print(f"\n==== Skipping merge (merge=false) ====")
             print(f"Individual segments saved to: {output_dir}")
             for file in segment_files:
                 print(f"  - {os.path.basename(file)}")
+            return segment_files
+        return None
     else:
         # Backward compatibility with old format
-        time_config = config['youtube'].get('time', {})
-        aspect_config = config['youtube'].get('aspect_ratio', {})
+        time_config = params.get('time', {})
+        aspect_config = params.get('aspect_ratio', {})
         
         # Create a segment from the old format
         segment = {
@@ -197,7 +254,8 @@ def download_video(config):
             'aspect_ratio': aspect_config
         }
         
-        download_segment(url, segment, quality, resolution, output_dir, base_filename, manual_video_type)
+        result = download_segment(url, segment, quality, resolution, output_dir, base_filename, manual_video_type)
+        return result
 
 def download_segment(url, segment, quality, resolution, output_dir, segment_filename=None, manual_video_type=None):
     """Download a video segment with specific settings."""
@@ -226,19 +284,20 @@ def download_segment(url, segment, quality, resolution, output_dir, segment_file
     
     # Create nested folder structure if no filename was provided
     if not segment_filename:
-        # Create folder structure
+        # Create folder structure - using output_dir as base
         folders = create_nested_folder_structure(output_dir, counter, video_info['channel'])
         
-        # Set the output path to the youtube subfolder
-        output_dir = folders["youtube_folder"]
+        # Set the output path to the download subfolder
+        output_dir = folders["download_folder"]
         
-        # Use video title as filename inside the youtube folder
+        # Use video title as filename inside the download folder
         video_title = re.sub(r'[^\w\s-]', '', video_info['title']).strip().replace(' ', '_')
         segment_filename = video_title if video_title else "video"
         
         print(f"Creating nested folder structure:")
-        print(f"  Main folder: {folders['main_folder']}")
         print(f"  YouTube folder: {folders['youtube_folder']}")
+        print(f"  Main folder: {folders['main_folder']}")
+        print(f"  Download folder: {folders['download_folder']}")
     
     # Build yt-dlp command
     cmd = ['yt-dlp']
@@ -412,13 +471,43 @@ def merge_video_segments(segment_files, output_file):
         
     return result.returncode == 0
 
-def main():
-    parser = argparse.ArgumentParser(description='Download YouTube videos using config file')
-    parser.add_argument('--config', '-c', default='/home/rteam2/m15kh/auto-subtitle/config/config.yaml', help='Path to YAML config file')
-    args = parser.parse_args()
+def youtube_downloader(config):
+    # Check if we want to directly use download_segment or the regular flow
+    params = read_youtube_config(config)
     
-    config = load_config(args.config)
-    download_video(config)
+    if params.get('direct_segment_download', False):
+        # Direct call to download_segment with parameters from config
+        url = params['url']
+        quality = params['quality']
+        resolution = params['resolution']
+        output_dir = params['output_dir']
+        base_filename = params['output']['filename'] if 'output' in params and 'filename' in params['output'] else None
+        manual_video_type = params['video_type']
+        
+        # Create segment from time and aspect_ratio if available
+        segment = {}
+        if 'time' in params:
+            segment['time'] = params['time']
+        if 'aspect_ratio' in params:
+            segment['aspect_ratio'] = params['aspect_ratio']
+        elif params['segments'] and len(params['segments']) > 0:
+            # If no direct aspect_ratio but segments exist, use the first segment's aspect_ratio
+            segment['aspect_ratio'] = params['segments'][0].get('aspect_ratio', {})
+        
+        # Call download_segment directly
+        result = download_segment(url, segment, quality, resolution, output_dir, base_filename, manual_video_type)
+        print(f"Download result: {result}")
+        return result
+    else:
+        # Regular flow
+        result = download_video(config)
+        print(f"Download result: {result}")
+        return result
 
 if __name__ == '__main__':
-    main()
+    
+    config_path = '/home/rteam2/m15kh/auto-subtitle/config/config.yaml'
+    with open(config_path, 'r') as file:
+        config = yaml.safe_load(file)
+    
+    video_path = youtube_downloader(config)

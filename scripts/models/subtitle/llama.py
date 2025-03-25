@@ -10,7 +10,6 @@ from tqdm import tqdm
 
 sys.path.append(".")
 from utils import *
-from SmartAITool.core import *
 
 # Uncomment below and comment "from .utils import *", if executing cli.py directly
 # import sys
@@ -89,12 +88,13 @@ def get_subtitles(audio_paths: list, output_srt: bool, output_dir: str, model:wh
         # if debug:
         #     print(result["segments"])
 
-        bprint("reforamt_subtitle")
+        print("reforamt_subtitle")
+        
         pretty_subtitle = reforamt_subtitle(result["segments"]) #reforamt subtitle to json for currect format moviepy
 
         with open(f"{srt_path_base}.json", 'w', encoding='utf-8') as json_file:
             json.dump(pretty_subtitle, json_file, indent=4, ensure_ascii=False)
-        cprint(f"json file is saved: {srt_path_base}.json", 'yellow')
+        print(f"json file is saved: {srt_path_base}.json")
         
         
     
