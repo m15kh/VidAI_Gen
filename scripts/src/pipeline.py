@@ -69,23 +69,23 @@ def main(config):
             
             
     cprint("[PIPELINE 3] editing video ...", "magenta")
-    add_captions(
-        download_video_path=download_video_path,
-        subtitle= subtitle,
-        font = "/home/rteam2/.fonts/truetype/Vazir/vazirmatn-master/fonts/ttf/Vazirmatn-Black.ttf",
-        font_size=50,
-        font_color="white",
-        stroke_width=2,
-        stroke_color="black",
-        shadow_strength=1.0,
-        shadow_blur=0.8,
-        highlight_current_word=True,
-        word_highlight_color="blue",
-        position=("center", "bottom"),  
-        line_count=1,
-        padding=50,
-        print_info=True,
-    )
+    # add_captions(
+    #     download_video_path=download_video_path,
+    #     subtitle= subtitle,
+    #     font = "/home/rteam2/.fonts/truetype/Vazir/vazirmatn-master/fonts/ttf/Vazirmatn-Black.ttf",
+    #     font_size=50,
+    #     font_color="white",
+    #     stroke_width=2,
+    #     stroke_color="black",
+    #     shadow_strength=1.0,
+    #     shadow_blur=0.8,
+    #     highlight_current_word=True,
+    #     word_highlight_color="blue",
+    #     position=("center", "bottom"),  
+    #     line_count=1,
+    #     padding=50,
+    #     print_info=True,
+    # )
     
 if __name__ == "__main__":
     
