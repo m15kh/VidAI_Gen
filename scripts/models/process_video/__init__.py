@@ -172,7 +172,7 @@ def get_font_path(font):
 #     return use_local_whisper
 
 def add_captions(
-    download_video_path,
+    video_path,
     subtitle,
     font="Bangers-Regular.ttf",
     font_size=130,
@@ -199,7 +199,7 @@ def add_captions(
         print("Generating video elements")
 
     # Open the video file
-    video = VideoFileClip(download_video_path)
+    video = VideoFileClip(video_path)
     text_bbox_width = video.w - padding * 2
     clips = [video]
     
@@ -302,23 +302,22 @@ def add_captions(
     if print_info:
         print("Rendering video...")
 
-    video_with_text = CompositeVideoClip(clips)
+    video_with_subtitle = CompositeVideoClip(clips)
 
-# BUG remove the following code
-    video_filename = os.path.splitext(os.path.basename(download_video_path))[0]
+    # video_filename = os.path.splitext(os.path.basename(download_video_path))[0]
 
-    base_dir = os.path.dirname(os.path.dirname(download_video_path))  # Gets output/youtube/11_youtube_Motivate_me
-    final_video_dir = os.path.join(base_dir, "final_video") 
-    os.makedirs(final_video_dir, exist_ok=True)
+    # base_dir = os.path.dirname(os.path.dirname(download_video_path))  # Gets output/youtube/11_youtube_Motivate_me
+    # final_video_dir = os.path.join(base_dir, "final_video") 
+    # os.makedirs(final_video_dir, exist_ok=True)
 
-    output_file = os.path.join(final_video_dir, f"sub_{video_filename}.mp4")
+    # output_file = os.path.join(final_video_dir, f"sub_{video_filename}.mp4")
 
-    video_with_text.write_videofile(
-        filename=output_file,
-        codec="libx264",
-        fps=video.fps,
-        logger="bar" if print_info else None,
-    )
+    # video_with_text.write_videofile(
+    #     filename=output_file,
+    #     codec="libx264",
+    #     fps=video.fps,
+    #     logger="bar" if print_info else None,
+    # )
 
     end_time = time.time()
     total_time = end_time - _start_time
@@ -328,3 +327,5 @@ def add_captions(
         print(f"Generated in {generation_time//60:02.0f}:{generation_time%60:02.0f}")
         print(f"Rendered in {render_time//60:02.0f}:{render_time%60:02.0f}")
         print(f"Done in {total_time//60:02.0f}:{total_time%60:02.0f}")
+
+    return video_with_subtitle

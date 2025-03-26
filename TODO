@@ -1,3 +1,23 @@
+#TODAY
+- add title for virst of video #[ ] 0.5h
+- add thumbail for first part of video #[ ] 0.5h
+- clean pipeline and add more comment #[ ] 0.5h
+
+
+
+
+#ONGOING_TASK
+    - add logo to video and  add in pipeline #[x] 1h
+    - add title for virst of video #[ ]
+    - add photo for first part of video #[ ] 
+    - read document moivey!!!! #[ ]  
+    - clean pipeline and add more comment #[ ]
+    - add telegram bot to this project #[ ]
+    - check path audio save in code
+
+
+
+
 #PRIORITY
 
     - phase
@@ -31,17 +51,16 @@
 
     - add wisper and movipy to piprline #[x]  
     - test lamfa model for persian and is lamda better or wisper which one is better? #[x] link(https://github.com/YJ-20/auto-subtitle-translate)
-    - add logo to video and can moive #[ ]
-    - can user select language model for subtitle #[ ]
-    - can determine want remove subtitle first and after subitle or not #[ ]
-    - write pipleline for this project #[ ]
-    - write yaml file for this project #[ ]
-    - add debug varialbe to this project #[ ]
-    - add folder for youtube video and download video from youtube #[ ]
+    - add logo to video and can moive #[x]
+    - can user select language model for subtitle #[x]
+    - write pipleline for this project #[x] 
+    - write yaml file for this project #[x]
+    - add debug varialbe to this project #[x]
+    - add folder for youtube video and download video from youtube #[x]
     - determine video is from youtube ir you wana upload to telegram bot #[ ]
     - add telegram bot to this project #[ ]
     - determine font size and font type for subtitle in yaml #[ ]
-    - add logo to video and can moive in yaml #[ ]
+    - add logo to video and can moive in yaml #[x]
     - add progreess bar for wisper model #[ ]
     - in yaml we must determine the video in english or persian  #[ ]  priority works by short emglish
     - in yanl we must dermine is it short video or a specifiv part of video #[ ]

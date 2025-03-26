@@ -1,15 +1,19 @@
 # Auto-Subtitle
 
-A comprehensive tool for automatically generating and adding captions to videos with support for multiple languages including English, Persian, and Arabic.
+A comprehensive tool for automatically generating and adding captions to videos with support for multiple languages including English, Persian, and Arabic. Perfect for content creators looking to make their videos more accessible across different language barriers.
 
 ## Features
 
 - Automatic video transcription using Whisper models
+- Translation between multiple languages (over 50 supported languages)
+- YouTube video downloading with automatic processing
 - Custom caption styling with font, color, and size options
 - Word-by-word highlighting for better readability
 - Special RTL (Right-to-Left) language support for Arabic and Persian
 - Configurable shadow and stroke effects for subtitle visibility
 - Pipeline-based processing for easy workflow automation
+- Logo overlay capabilities with customizable positioning
+- AI-powered title and description generation for content
 
 ## Installation
 
@@ -17,6 +21,7 @@ A comprehensive tool for automatically generating and adding captions to videos 
 
 - Python 3.9+
 - FFmpeg
+- Internet connection for model downloads
 
 ### Setup
 
@@ -31,9 +36,13 @@ cd auto-subtitle
 pip install -r requirements.txt
 ```
 
+3. Download the required models (will be done automatically on first run)
+
 ## Usage
 
 ### Basic Usage
+
+Edit the configuration file at `config/config.yaml` with your video path or YouTube URL, then run:
 
 ```bash
 python main.py
@@ -41,41 +50,104 @@ python main.py
 
 ### Using the Pipeline
 
-The pipeline allows you to process videos through transcription and captioning in one step:
+The pipeline allows you to process videos through downloading, transcription, and captioning in one step:
 
 ```bash
 python -m scripts.src.pipeline
 ```
+
+### Processing YouTube Videos
+
+To download and process a YouTube video:
+
+1. Set the video URL in `config.yaml`:
+```yaml
+video_path: "https://youtube.com/shorts/kJ23zVr3HkE?si=M1O4CTvycVwbnZwR"
+subtitle_path: null  # Let the system generate subtitles
+```
+
+2. Run the pipeline script
+
+### Processing Local Videos
+
+To process a video you already have:
+
+1. Set the video file path in `config.yaml`:
+```yaml
+video_path: "/path/to/your/video.mp4"
+subtitle_path: null  # Let the system generate subtitles
+```
+
+2. Run the pipeline script
 
 ## Configuration
 
 Configuration is done through the `config/config.yaml` file:
 
 ```yaml
-video:
-  # Path to video file or URL
-  address: "/path/to/your/video.mp4"
-  subtitle: "/path/to/subtitle/file.json"
-  format: "mp4"
-  
-subtitle:
-  model: "large"  # Options: base, small, medium, large
-  
-processing:
-  debug_mode: false
-  language: "en"  # Options: en, fa, ar, etc.
-  quality: "medium"  # Options: low, medium, high
-
-output:
-  subtitle_format: "srt"
-  
+# Main configuration
+video_path: "https://youtube.com/shorts/kJ23zVr3HkE?si=M1O4CTvycVwbnZwR"
+subtitle_path: null  # Set to a JSON file path to use existing subtitles
+output_dir: "output"
 debug_mode: True
-output_dir: /path/to/output
+
+# YouTube download settings
+youtube:
+  quality: "best"  # Options: "best", "worst", or format code
+  ratio: "9:16"    # Common values: "16:9" (landscape), "9:16" (portrait/shorts)
+
+  output:
+    filename: null  # Auto-generated if null
+    merge: true     # Merge all segments into single video
+
+# Subtitle processing settings
+process_subtitle:
+  enabled: true
+  model: "large"    # Choices: tiny, base, small, medium, large
+  verbose: false
+  task: "translate" # Choices: transcribe, translate
+  language: "en"    # Source language (auto for automatic detection) 
+  translate_to: 'fa_IR'  # Target language, null for no translation
+
+# Video editor settings
+video_editor:
+  logo:
+    enabled: false  # Enable/disable logo overlay
 ```
+
+## Supported Languages
+
+Auto-Subtitle supports over 50 languages including:
+
+- English (en_XX)
+- Persian/Farsi (fa_IR)
+- Arabic (ar_AR)
+- Chinese (zh_CN)
+- German (de_DE)
+- Spanish (es_XX)
+- Russian (ru_RU)
+- Korean (ko_KR)
+- French (fr_XX)
+- Japanese (ja_XX)
+- Portuguese (pt_XX)
+- Turkish (tr_TR)
+- Hindi (hi_IN)
+- Italian (it_IT)
+- Dutch (nl_XX)
+- and many more...
+
+## Output Files
+
+The system generates several files during processing:
+
+1. **JSON subtitle file**: Contains time-aligned words and sentences
+2. **WAV audio file**: Temporary extracted audio for processing
+3. **Final video file**: Video with the captions burned in
+4. **Content description file**: Optional AI-generated video titles and descriptions
 
 ## Customizing Captions
 
-You can customize the appearance of captions by modifying parameters in `main.py` or `pipeline.py`:
+You can customize the appearance of captions by modifying parameters in the configuration or directly via function calls:
 
 ```python
 captacity.add_captions(
@@ -96,6 +168,22 @@ captacity.add_captions(
     print_info=True,
 )
 ```
+
+### Caption Parameters
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| font | Path to TTF font file | System default |
+| font_size | Size of subtitle text | 50 |
+| font_color | Color of subtitle text | "white" |
+| stroke_width | Width of text outline | 2 |
+| stroke_color | Color of text outline | "black" |
+| shadow_strength | Intensity of drop shadow (0.0-1.0) | 1.0 |
+| shadow_blur | Blur radius for shadow | 0.8 |
+| highlight_current_word | Whether to highlight the current word | True |
+| word_highlight_color | Color for highlighted words | "blue" |
+| line_count | Maximum number of subtitle lines | 2 |
+| padding | Bottom padding for subtitles | 50 |
 
 ## Project Structure
 

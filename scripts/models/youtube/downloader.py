@@ -97,14 +97,15 @@ def create_nested_folder_structure(output_base_dir, counter, channel_name):
         "download_folder": download_folder_path
     }
 
-def read_youtube_config(config):
+def download_video(config):
     """
-    Extract all YouTube configuration parameters from the config dict.
-    Returns a structured dictionary with all needed parameters.
+    Extract YouTube configuration and download video segments using yt-dlp.
+    Returns the path to the downloaded video or list of segment files.
     """
-    youtube_config = {
+    # Extract all YouTube configuration parameters from the config dict
+    params = {
         # Basic video parameters
-        'url': config['youtube'].get('url', ''),
+        'url': config.get('video_path', ''),
         'quality': config['youtube'].get('quality', 'best'),
         'resolution': config['youtube'].get('resolution', None),
         'download_full': config['youtube'].get('download_full', False),
@@ -131,16 +132,9 @@ def read_youtube_config(config):
     
     # For backward compatibility with old format
     if 'time' in config['youtube']:
-        youtube_config['time'] = config['youtube'].get('time', {})
+        params['time'] = config['youtube'].get('time', {})
     if 'aspect_ratio' in config['youtube']:
-        youtube_config['aspect_ratio'] = config['youtube'].get('aspect_ratio', {})
-    
-    return youtube_config
-
-def download_video(config):
-    """Download video segments using yt-dlp with the specified configuration."""
-    # Extract all needed parameters from the config
-    params = read_youtube_config(config)
+        params['aspect_ratio'] = config['youtube'].get('aspect_ratio', {})
     
     # Extract common parameters from the parsed config
     url = params['url']
@@ -160,7 +154,6 @@ def download_video(config):
     output_dir = params['output_dir']
     base_filename = params['output']['filename']
     should_merge = params['output']['merge']
-    
     
     # If custom filename formatting is enabled and no base_filename is provided
     if not base_filename and (use_counter or use_channel):
@@ -473,26 +466,24 @@ def merge_video_segments(segment_files, output_file):
 
 def youtube_downloader(config):
     # Check if we want to directly use download_segment or the regular flow
-    params = read_youtube_config(config)
-    
-    if params.get('direct_segment_download', False):
+    if config['youtube'].get('direct_segment_download', False):
         # Direct call to download_segment with parameters from config
-        url = params['url']
-        quality = params['quality']
-        resolution = params['resolution']
-        output_dir = params['output_dir']
-        base_filename = params['output']['filename'] if 'output' in params and 'filename' in params['output'] else None
-        manual_video_type = params['video_type']
+        url = config.get('video_path', '')
+        quality = config['youtube'].get('quality', 'best')
+        resolution = config['youtube'].get('resolution', None)
+        output_dir = config.get('output_dir', './output')
+        base_filename = config['youtube'].get('output', {}).get('filename', None)
+        manual_video_type = config['youtube'].get('video_type', None)
         
         # Create segment from time and aspect_ratio if available
         segment = {}
-        if 'time' in params:
-            segment['time'] = params['time']
-        if 'aspect_ratio' in params:
-            segment['aspect_ratio'] = params['aspect_ratio']
-        elif params['segments'] and len(params['segments']) > 0:
+        if 'time' in config['youtube']:
+            segment['time'] = config['youtube']['time']
+        if 'aspect_ratio' in config['youtube']:
+            segment['aspect_ratio'] = config['youtube']['aspect_ratio']
+        elif config['youtube'].get('segments') and len(config['youtube']['segments']) > 0:
             # If no direct aspect_ratio but segments exist, use the first segment's aspect_ratio
-            segment['aspect_ratio'] = params['segments'][0].get('aspect_ratio', {})
+            segment['aspect_ratio'] = config['youtube']['segments'][0].get('aspect_ratio', {})
         
         # Call download_segment directly
         result = download_segment(url, segment, quality, resolution, output_dir, base_filename, manual_video_type)

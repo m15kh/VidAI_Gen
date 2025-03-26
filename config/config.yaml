@@ -1,12 +1,14 @@
 #-----------------------------------MAIN-----------------------------------
-video_path: "/home/rteam2/m15kh/auto-subtitle/output/youtube/11_youtube_Motivate_me/download/Winners_and_Losers_Mindset__Andrew_Huberman.mp4"
-subtitle_path: null # if you want to use subtitle file, set the path
+# video_path: "/home/rteam2/m15kh/auto-subtitle/output/youtube/21_youtube_Motivate_me/download/Cristiano_Ronaldo_Winning_Mentality__Cristiano_Ronaldo_Motivation.mp4"
+video_path: "https://youtube.com/shorts/kJ23zVr3HkE?si=M1O4CTvycVwbnZwR"
+
+# subtitle_path: "/home/rteam2/m15kh/auto-subtitle/output/youtube/21_youtube_Motivate_me/subtitle/Cristiano_Ronaldo_Winning_Mentality__Cristiano_Ronaldo_Motivation.json" # if you want to use subtitle file, set the path
+subtitle_path: null
 output_dir: "output"
 debug_mode: True
-
+GPT_API: "AIzaSyD7"
 #-----------------------------------youtube-----------------------------------
 youtube:
-  url: "https://youtube.com/shorts/kJ23zVr3HkE?si=M1O4CTvycVwbnZwR"
   quality: "best"  # Options: "best", "worst", or format code like "137+140"
   resolution: "1080p"  # Options: "240p", "360p", "480p", "720p", "1080p", etc. 
                         # Note: For Shorts, resolution is automatically determined for best compatibility
@@ -33,6 +35,7 @@ youtube:
 
 #-----------------------------------subtitle-----------------------------------
 process_subtitle:
+    enabled: true
   # Whisper model options
     model: "large"  # Choices: tiny, base, small, medium, large
     # Output options
@@ -46,10 +49,24 @@ process_subtitle:
 #-----------------------------------video_editor-----------------------------------
 video_editor:
 
+  logo:
+    enabled: false  # Set to false to disable logo
+    output_video_path: /home/rteam2/m15kh/auto-subtitle/notebook/add-logo/add-logoooo.mp4
+  
+  subtitle:
+    enabled: true  # Set to false to disable subtitle
+    text: "@Max_o_Ava"
+    fontsize: 30
+    color: "red"
+    background_color: "rgba(0,0,0,0.4)"
+    # movement line removed as it's now randomly selected in the script
+    shadow:
+      enabled: true
+      color: "black"
+      offset_x: 2
+      offset_y: 2
+      blur: 3
+    effect: "pulse"  # Options: none, fade_in_out, pulse, bounce
+    animation_speed: 1.0  # Speed multiplier for effects
 
-
-#-----------------------------------internal-----------------------------------
-#NOTE : Do not change these values
-internal:
-  path_download_video: 
 
