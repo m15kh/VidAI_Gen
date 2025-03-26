@@ -1,26 +1,26 @@
-# Video paths to transcribe (required)
-video_path: "/home/rteam2/m15kh/auto-subtitle/data/time.mp4"
-# subtitle_path: "/home/rteam2/m15kh/auto-subtitle/subtitled/time/subtitle/time.json" #if None, it will be saved in the same directory as the video
-subtitle_path: null
-output_dir: "subtitled"
+#-----------------------------------MAIN-----------------------------------
+video_path: "/home/rteam2/m15kh/auto-subtitle/data/43_youtube_Motivate_me/download/Cristiano_Ronaldo_Winning_Mentality__Cristiano_Ronaldo_Motivation.mp4"
+# video_path: "https://youtube.com/shorts/kJ23zVr3HkE?si=M1O4CTvycVwbnZwR"
+
+subtitle_path: "/home/rteam2/m15kh/auto-subtitle/data/43_youtube_Motivate_me/subtitle/Cristiano_Ronaldo_Winning_Mentality__Cristiano_Ronaldo_Motivation.json" # if you want to use subtitle file, set the path
+# subtitle_path: null
+output_dir: "output"
 debug_mode: True
-
-
-
+GPT_API: "AIzaSyD7"
+#-----------------------------------youtube-----------------------------------
 youtube:
-  url: "https://www.youtube.com/shorts/S0pYBB8uB20?feature=share"
   quality: "best"  # Options: "best", "worst", or format code like "137+140"
   resolution: "1080p"  # Options: "240p", "360p", "480p", "720p", "1080p", etc. 
-                       # Note: For Shorts, resolution is automatically determined for best compatibility
+                        # Note: For Shorts, resolution is automatically determined for best compatibility
   download_full: True  # Set to true to download the full video, false to use segments
   video_type: "regular"  # Options: "short" or "regular" - manually specify video type
-  
+
   # Filename format configuration
   filename_format:
     use_counter: True    # Include a sequential number in filenames
     use_channel: True    # Include channel name in filenames 
     prefix: ""           # Optional prefix before the counter
-  
+
   segments:
     - time:
         start: "00:23:01"  # Format: HH:MM:SS
@@ -28,27 +28,64 @@ youtube:
       aspect_ratio:
         mode: "scale"  # Using the new scale mode (adds black bars for regular videos)
         ratio: "9:16"  # Common values: "16:9" (landscape), "9:16" (portrait/shorts)
-        
+
   output:
-    directory: "./downloads"  # Directory where videos will be saved
     filename: null            # Set to null to use auto-generated filenames with counter and channel
     merge: true               # Whether to merge all segments into single video
 
-
-
-
+#-----------------------------------subtitle-----------------------------------
 process_subtitle:
-# Whisper model options
-  model: "large"  # Choices: tiny, base, small, medium, large
-  # Output options
-  verbose: false
-  # Language processing
-  task: "transcribe"  # Choices: transcribe, translate
-  language: "en"  # Source language (auto for automatic detection)
-  translate_to: null
+    enabled: false
+  # Whisper model options
+    model: "large"  # Choices: tiny, base, small, medium, large
+    # Output options
+    verbose: false
+    # Language processing
+    task: "translate"  # Choices: transcribe, translate
+    language: "en"  # Source language (auto for automatic detection)
+    translate_to: 'fa_IR'   #'fa_IR'  #null for no translation
 
 
-
+#-----------------------------------video_editor-----------------------------------
 video_editor:
+
+  logo:
+    enabled: true  # Set to false to disable logo
+    output_video_path: /home/rteam2/m15kh/auto-subtitle/notebook/add-logo/add-logoooo.mp4
+  
+  subtitle:
+    enabled: true  # Set to false to disable subtitle
+    text: "@Max_o_Ava"
+    fontsize: 30
+    color: "red"
+    background_color: "rgba(0,0,0,0.4)"
+    # movement line removed as it's now randomly selected in the script
+    shadow:
+      enabled: true
+      color: "black"
+      offset_x: 2
+      offset_y: 2
+      blur: 3
+    effect: "pulse"  # Options: none, fade_in_out, pulse, bounce
+    animation_speed: 1.0  # Speed multiplier for effects
+
+#-----------------------------------GPT-----------------------------------
+gpt:
+  api_key: "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"
+  model: "gpt-4o"
+  title:
+    system_prompt: "You are a YouTube video title expert. Create attention-grabbing, SEO-friendly titles."
+    user_prompt_template: "Create an engaging and clickable video title based on this content: {content}\n\nExamples of great titles:\n1. \"The Winner's Mindset: Transform Challenges into Opportunities\"\n2. \"Losers React, Winners Respond: The Crucial Difference\"\n3. \"How Top Performers Turn Negative Emotions into Success\"\n4. \"The Secret Mindset Shift That Separates Winners from Everyone Else\"\n5. \"Transmute Your Struggles: The Psychology of High Achievement\"\n\nCreate a title that's catchy, specific, and around 5-10 words."
+    max_tokens: 50
+  description:
+    system_prompt: "You are a social media expert. Create a concise and engaging Instagram description."
+    user_prompt_template: "Create an Instagram description (maximum 150 characters) for this content: {content}"
+    max_tokens: 100
+    max_length: 150
+  hashtags:
+    system_prompt: "You are a social media hashtag expert. Create exactly 10 relevant and trending hashtags."
+    user_prompt_template: "Create exactly 10 relevant hashtags for Instagram for this content: {content}. Format them as a list of strings with hashtag symbols."
+    max_tokens: 100
+    count: 5
 
 
