@@ -16,7 +16,7 @@ from scripts.src.config import load_general_config, load_subtitle_config
     
 def main(config):
     #Load the configuration file [MAIN]
-    debugger, video_path, subtitle_path, output_dir_path = load_general_config(config)
+    debugger, video_path, subtitle_path = load_general_config(config)
     
     cprint(f"the debug-mode is: {'ON' if debugger else 'OFF'}", "red" if debugger else "green")
 
@@ -49,8 +49,14 @@ def main(config):
 
 
     if subtitle_path == None:
-           cprint("[PIPELINE 2] creating subtitle model ...", "magenta")
-           subtitle = generate_subtitle(video_path, output_dir, model_name, language, translate_to, args)
+        cprint("[PIPELINE 2] creating subtitle model ...", "magenta")
+        subtitle = generate_subtitle(video_path, output_dir, model_name, language, translate_to, args)
+        
+        subtitle_json_path = os.path.join(subtitle_dir, f"{filename}.json")
+        with open(subtitle_json_path, 'w', encoding='utf-8') as json_file:
+            json.dump(subtitle, json_file, indent=4, ensure_ascii=False)
+        cprint(f"subtitle json format is saved: {subtitle_json_path}", 'yellow')
+
     else:
         cprint("subtitle path is provided [SKIP [PIPELINE 2]]", "red")
         with open(subtitle_path, 'r') as file:
@@ -71,7 +77,7 @@ def main(config):
             shadow_strength=1.0,
             shadow_blur=0.8,
             highlight_current_word=True,
-            word_highlight_color="green",
+            word_highlight_color="red",
             position=("center", "bottom"),  
             line_count=1,
             padding=50,
@@ -84,6 +90,8 @@ def main(config):
     
     if config["video_editor"]["logo"]["enabled"] == True:
         cprint("[PIPELINE 4] Adding logo to the video ...", "magenta")
+        if config["process_subtitle"]["enabled"] == False:
+            edit_video = video_path
         edit_video = add_logo(config, edit_video)
     else:
         cprint("adding logo is disabled [SKIP [PIPELINE 4]]", "red")
@@ -97,8 +105,14 @@ def main(config):
     
     # ---------------------[PIPELINE 7](Save Final-Video)---------------------
     cprint("[PIPELINE 7] Saving Final-Video ...", "magenta")
-    edit_video.write_videofile(final_video_dir)
+    output_video_path = os.path.join(final_video_dir, f"{filename}_final.mp4")
+    edit_video.write_videofile(output_video_path, codec="libx264")
+    cprint(f"Final video saved at: {output_video_path}", "yellow")
+    #----------------------[PIPELINE 8](upload telegram)---------------------
+    #----------------------[PIPELINE 9](Removing temp files)---------------------
     
+
+        
 if __name__ == "__main__":
     
     cprint("pipeline is running ...", "blue")

@@ -14,6 +14,7 @@
     - clean pipeline and add more comment #[ ]
     - add telegram bot to this project #[ ]
     - check path audio save in code
+    - edit create folder download video in pipeline not in downloader file
 
 
 
@@ -65,3 +66,4 @@
     - in yaml we must determine the video in english or persian  #[ ]  priority works by short emglish
     - in yanl we must dermine is it short video or a specifiv part of video #[ ]
     - in bot sent srt foramt and you edit and after create video #[ ]
+    - sent status each pipeline to telegram bot #[ ]

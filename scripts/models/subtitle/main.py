@@ -40,8 +40,9 @@ def generate_subtitle(video_path, output_dir, model_name, language, translate_to
     _, _, subtitle_dir, _ = output_dir
     output_srt = True  # Enable SRT output
     
+
     print("Generating subtitles")
-    pretty_subtitle, _ = get_subtitles( 
+    pretty_subtitle = get_subtitles( 
         audios, 
         output_dir,
         model,

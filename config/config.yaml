@@ -1,9 +1,9 @@
 #-----------------------------------MAIN-----------------------------------
-# video_path: "/home/rteam2/m15kh/auto-subtitle/output/youtube/21_youtube_Motivate_me/download/Cristiano_Ronaldo_Winning_Mentality__Cristiano_Ronaldo_Motivation.mp4"
-video_path: "https://youtube.com/shorts/kJ23zVr3HkE?si=M1O4CTvycVwbnZwR"
+video_path: "/home/rteam2/m15kh/auto-subtitle/data/43_youtube_Motivate_me/download/Cristiano_Ronaldo_Winning_Mentality__Cristiano_Ronaldo_Motivation.mp4"
+# video_path: "https://youtube.com/shorts/kJ23zVr3HkE?si=M1O4CTvycVwbnZwR"
 
-# subtitle_path: "/home/rteam2/m15kh/auto-subtitle/output/youtube/21_youtube_Motivate_me/subtitle/Cristiano_Ronaldo_Winning_Mentality__Cristiano_Ronaldo_Motivation.json" # if you want to use subtitle file, set the path
-subtitle_path: null
+subtitle_path: "/home/rteam2/m15kh/auto-subtitle/data/43_youtube_Motivate_me/subtitle/Cristiano_Ronaldo_Winning_Mentality__Cristiano_Ronaldo_Motivation.json" # if you want to use subtitle file, set the path
+# subtitle_path: null
 output_dir: "output"
 debug_mode: True
 GPT_API: "AIzaSyD7"
@@ -35,7 +35,7 @@ youtube:
 
 #-----------------------------------subtitle-----------------------------------
 process_subtitle:
-    enabled: true
+    enabled: false
   # Whisper model options
     model: "large"  # Choices: tiny, base, small, medium, large
     # Output options
@@ -50,7 +50,7 @@ process_subtitle:
 video_editor:
 
   logo:
-    enabled: false  # Set to false to disable logo
+    enabled: true  # Set to false to disable logo
     output_video_path: /home/rteam2/m15kh/auto-subtitle/notebook/add-logo/add-logoooo.mp4
   
   subtitle:
@@ -68,5 +68,24 @@ video_editor:
       blur: 3
     effect: "pulse"  # Options: none, fade_in_out, pulse, bounce
     animation_speed: 1.0  # Speed multiplier for effects
+
+#-----------------------------------GPT-----------------------------------
+gpt:
+  api_key: "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"
+  model: "gpt-4o"
+  title:
+    system_prompt: "You are a YouTube video title expert. Create attention-grabbing, SEO-friendly titles."
+    user_prompt_template: "Create an engaging and clickable video title based on this content: {content}\n\nExamples of great titles:\n1. \"The Winner's Mindset: Transform Challenges into Opportunities\"\n2. \"Losers React, Winners Respond: The Crucial Difference\"\n3. \"How Top Performers Turn Negative Emotions into Success\"\n4. \"The Secret Mindset Shift That Separates Winners from Everyone Else\"\n5. \"Transmute Your Struggles: The Psychology of High Achievement\"\n\nCreate a title that's catchy, specific, and around 5-10 words."
+    max_tokens: 50
+  description:
+    system_prompt: "You are a social media expert. Create a concise and engaging Instagram description."
+    user_prompt_template: "Create an Instagram description (maximum 150 characters) for this content: {content}"
+    max_tokens: 100
+    max_length: 150
+  hashtags:
+    system_prompt: "You are a social media hashtag expert. Create exactly 10 relevant and trending hashtags."
+    user_prompt_template: "Create exactly 10 relevant hashtags for Instagram for this content: {content}. Format them as a list of strings with hashtag symbols."
+    max_tokens: 100
+    count: 5
 
 

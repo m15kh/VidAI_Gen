@@ -1,15 +1,31 @@
 import openai
 import json
 import os
+import yaml  # Add yaml import for config parsing
 
-openai.api_key = "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"
+def load_config():
+    """Load GPT configuration settings from config file."""
+    config_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 
+                               "config", "config.yaml")
+    
+    if not os.path.exists(config_path):
+        raise FileNotFoundError(f"Configuration file not found at {config_path}")
+    
+    with open(config_path, 'r') as config_file:
+        config = yaml.safe_load(config_file)
+    
+    # Check if GPT configuration exists
+    if "gpt" not in config:
+        raise ValueError("GPT configuration is missing in the config file")
+    
+    return config["gpt"]
 
 def read_subtitle_file(file_path):
     """Read a JSON file containing subtitle data."""
     with open(file_path, 'r') as file:
         return json.load(file)
 
-def generate_instagram_description(subtitle_data):
+def generate_instagram_description(subtitle_data, config):
     """Generate an Instagram description from subtitle data."""
     # Extract the text from each segment
     text_segments = [item['text'] for item in subtitle_data]
@@ -19,23 +35,24 @@ def generate_instagram_description(subtitle_data):
     
     # Generate description using GPT
     response = openai.chat.completions.create(
-        model="gpt-4o",
+        model=config.get("model", "gpt-4o"),
         messages=[
-            {"role": "system", "content": "You are a social media expert. Create a concise and engaging Instagram description."},
-            {"role": "user", "content": f"Create an Instagram description (maximum 150 characters) for this content: {full_text}"}
+            {"role": "system", "content": config["description"]["system_prompt"]},
+            {"role": "user", "content": config["description"]["user_prompt_template"].format(content=full_text)}
         ],
-        max_tokens=100
+        max_tokens=config["description"]["max_tokens"]
     )
     
     description = response.choices[0].message.content
     
-    # Ensure the description is under 150 characters
-    if len(description) > 150:
-        description = description[:147] + "..."
+    # Ensure the description is under max_length characters
+    max_length = config["description"].get("max_length", 150)
+    if len(description) > max_length:
+        description = description[:max_length-3] + "..."
         
     return description
 
-def generate_hashtags(subtitle_data):
+def generate_hashtags(subtitle_data, config):
     """Generate 10 relevant hashtags for Instagram based on subtitle content."""
     # Extract the text from each segment
     text_segments = [item['text'] for item in subtitle_data]
@@ -45,39 +62,37 @@ def generate_hashtags(subtitle_data):
     
     # Generate hashtags using GPT
     response = openai.chat.completions.create(
-        model="gpt-4o",
+        model=config.get("model", "gpt-4o"),
         messages=[
-            {"role": "system", "content": "You are a social media hashtag expert. Create exactly 10 relevant and trending hashtags."},
-            {"role": "user", "content": f"Create exactly 10 relevant hashtags for Instagram for this content: {full_text}. Format them as a list of strings with hashtag symbols."}
+            {"role": "system", "content": config["hashtags"]["system_prompt"]},
+            {"role": "user", "content": config["hashtags"]["user_prompt_template"].format(content=full_text)}
         ],
-        max_tokens=100
+        max_tokens=config["hashtags"]["max_tokens"]
     )
     
     hashtags_text = response.choices[0].message.content
     
-    # Process the hashtags to ensure we have exactly 10
-    # First, try to extract hashtags that already have # symbol
+    # Process the hashtags to ensure we have exactly the requested number
     import re
     hashtags = re.findall(r'#\w+', hashtags_text)
     
-    # If we don't have enough formatted hashtags, extract words and add # symbol
-    if len(hashtags) != 10:
-        # Try to extract from a numbered or bulleted list
+    # If we don't have enough formatted hashtags, extract from a numbered or bulleted list
+    if len(hashtags) != config["hashtags"]["count"]:
         list_items = re.findall(r'[\d\.\*\-]\s*#?(\w+)', hashtags_text)
         hashtags = [f"#{item}" if not item.startswith('#') else item for item in list_items]
     
-    # If we still don't have 10 hashtags, use any words we can find
-    if len(hashtags) != 10:
+    # If we still don't have enough hashtags, use any words we can find
+    if len(hashtags) != config["hashtags"]["count"]:
         words = re.findall(r'\b(\w+)\b', hashtags_text)
-        hashtags = [f"#{word.lower()}" for word in words if len(word) > 3][:10]
+        hashtags = [f"#{word.lower()}" for word in words if len(word) > 3][:config["hashtags"]["count"]]
     
-    # Ensure we have exactly 10 hashtags
-    if len(hashtags) > 10:
-        hashtags = hashtags[:10]
+    # Ensure we have exactly the requested number of hashtags
+    if len(hashtags) > config["hashtags"]["count"]:
+        hashtags = hashtags[:config["hashtags"]["count"]]
     
     return " ".join(hashtags)
 
-def generate_video_title(subtitle_data):
+def generate_video_title(subtitle_data, config):
     """Generate an engaging video title based on subtitle content."""
     # Extract the text from each segment
     text_segments = [item['text'] for item in subtitle_data]
@@ -87,22 +102,12 @@ def generate_video_title(subtitle_data):
     
     # Generate title using GPT
     response = openai.chat.completions.create(
-        model="gpt-4o",
+        model=config.get("model", "gpt-4o"),
         messages=[
-            {"role": "system", "content": "You are a YouTube video title expert. Create attention-grabbing, SEO-friendly titles."},
-            {"role": "user", "content": f"""Create an engaging and clickable video title based on this content: {full_text}
-
-Examples of great titles:
-1. "The Winner's Mindset: Transform Challenges into Opportunities"
-2. "Losers React, Winners Respond: The Crucial Difference"
-3. "How Top Performers Turn Negative Emotions into Success"
-4. "The Secret Mindset Shift That Separates Winners from Everyone Else"
-5. "Transmute Your Struggles: The Psychology of High Achievement"
-
-Create a title that's catchy, specific, and around 5-10 words.
-"""}
+            {"role": "system", "content": config["title"]["system_prompt"]},
+            {"role": "user", "content": config["title"]["user_prompt_template"].format(content=full_text)}
         ],
-        max_tokens=50
+        max_tokens=config["title"]["max_tokens"]
     )
     
     title = response.choices[0].message.content.strip()
@@ -115,29 +120,27 @@ Create a title that's catchy, specific, and around 5-10 words.
 
 def main(file_path, output_file=None):
     """Main function to process subtitle file and generate content."""
+    # Load configuration
+    config = load_config()
+    
+    # Set API key
+    openai.api_key = config["api_key"]
+    
     subtitle_data = read_subtitle_file(file_path)
     
     # Generate title
-    title = generate_video_title(subtitle_data)
+    title = generate_video_title(subtitle_data, config)
     
     # Generate Instagram content
-    description = generate_instagram_description(subtitle_data)
-    hashtags = generate_hashtags(subtitle_data)
+    description = generate_instagram_description(subtitle_data, config)
+    hashtags = generate_hashtags(subtitle_data, config)
     
-    # Prepare output content
-    output_content = f"""Video Title:
-{title}
-Character count: {len(title)}
-
-{'-'*50}
-
-Instagram Description (150 char max):
-{description}
-Character count: {len(description)}
-
-Instagram Hashtags (10):
-{hashtags}
-"""
+    # Prepare output content as JSON
+    output_content = {
+        "title": title,
+        "description": description,
+        "hashtags": hashtags
+    }
     
     # Print to console
     print(output_content)
@@ -148,7 +151,7 @@ Instagram Hashtags (10):
         os.makedirs(os.path.dirname(os.path.abspath(output_file)), exist_ok=True)
         
         with open(output_file, 'w', encoding='utf-8') as f:
-            f.write(output_content)
+            json.dump(output_content, f, ensure_ascii=False, indent=4)
         print(f"Output saved to: {output_file}")
     
     return title, description, hashtags
@@ -161,6 +164,6 @@ if __name__ == "__main__":
     # Generate output file path based on input file
     base_name = os.path.splitext(os.path.basename(input_file))[0]
     output_dir = os.path.join(os.path.dirname(os.path.dirname(input_file)), "descriptions")
-    output_file = os.path.join(output_dir, f"{base_name}_content.txt")
+    output_file = os.path.join(output_dir, f"{base_name}_content.json")
     
     main(input_file, output_file)

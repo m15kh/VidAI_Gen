@@ -69,19 +69,16 @@ def apply_text_effect(txt_clip, effect, duration, speed=1.0):
         # No effect
         return txt_clip
 
-def add_logo(config, video_with_subtitle, ):
+def add_logo(config, video):
     """Main function to process video with subtitle and logo effects"""
 
+# Check if the path is valid
+    if os.path.isfile(video):
+        video = VideoFileClip(video)
 
-    # Get paths from config
-    # input_video_path = download_video_path
-    output_video_path = config["video_editor"]["logo"]["output_video_path"]
 
     # Check if subtitle is enabled
     subtitle_enabled = config["video_editor"].get("subtitle", {}).get("enabled", True)
-
-    # Load the video
-    video = video_with_subtitle
 
     # List to hold all clips (starting with the base video)
     clips = [video]

@@ -4,10 +4,9 @@ def load_general_config(config):
     debugger = config['debug_mode']
     video_path = config["video_path"]
     subtitle_path = config["subtitle_path"]
-    output_dir_path = config['output_dir']
         
         
-    return debugger, video_path, subtitle_path, output_dir_path
+    return debugger, video_path, subtitle_path
 
 def load_subtitle_config(config):
      
