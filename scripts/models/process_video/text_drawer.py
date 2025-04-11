@@ -1,7 +1,13 @@
-from moviepy.editor import TextClip, ImageClip, VideoClip, CompositeVideoClip
 from PIL import Image, ImageFilter, ImageFont
 import numpy
 import tempfile
+
+from moviepy.video.VideoClip import (
+    ImageClip,
+    TextClip,
+    VideoClip,
+)
+from moviepy.video.compositing.CompositeVideoClip import CompositeVideoClip
 
 text_cache = {}
 
@@ -31,7 +37,8 @@ class TextClipEx(TextClip):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.text = kwargs["txt"]
+        self.text = kwargs["text"]
+
 
 def moviepy_to_pillow(clip) -> Image:
     temp_file = tempfile.NamedTemporaryFile(suffix=".png").name
@@ -79,6 +86,8 @@ def create_text(
     stroke_color: str | None = None,
     stroke_width: int = 1,
     kerning: float = 0.0,
+    margin: tuple[int, int] = (50, 50),
+    
 ) -> VideoClip:
     global text_cache
 
@@ -86,10 +95,11 @@ def create_text(
 
     if arg_hash in text_cache:
         return text_cache[arg_hash].copy()
+    #BUG remove kerning
+    text_clip = TextClipEx( text=text, font_size=fontsize, color=color, bg_color=bg_color, font=font, stroke_color=stroke_color, stroke_width=stroke_width,
+                           margin = (50, 50) )
 
-    text_clip = TextClipEx(txt=text, fontsize=fontsize, color=color, bg_color=bg_color, font=font, stroke_color=stroke_color, stroke_width=stroke_width, kerning=kerning)
-
-    text_clip = text_clip.set_opacity(opacity)
+    text_clip = text_clip.with_opacity(opacity)
 
     if blur_radius:
         text_clip = blur_text_clip(text_clip, blur_radius)
@@ -119,7 +129,8 @@ def create_text_chars(
                 chars.append(Character(" ", item.color))
         else:
             chars = [item]
-
+        if bg_color == 'transparent':
+            bg_color = (0, 0, 0, 0)
         for char in chars:
             clip = create_text(char.text, fontsize, char.color or color, font, bg_color, blur_radius, opacity, stroke_color, stroke_width)
             clips.append(clip)
@@ -142,7 +153,7 @@ def create_composite_text(text_clips: list[VideoClip], font, font_size) -> Compo
 
     for clip in text_clips:
         clip.size = (int(full_width), clip.size[1])
-        clip = clip.set_position((int(offset_x), 0))
+        clip = clip.with_position((int(offset_x), 0))
         width = font.getlength(clip.text)
         offset_x += width * scale_factor
         clips.append(clip)

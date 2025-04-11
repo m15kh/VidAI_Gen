@@ -66,22 +66,27 @@ def main(config):
     # ---------------------[PIPELINE 3](adding subtitle to video)---------------------
     if config["process_subtitle"]["enabled"] == True:
         cprint("[PIPELINE 3] adding subtitle to video ...", "magenta")
+        
+        # Get Add_subtitle config or use defaults if not present
+        add_subtitle_config = config["video_editor"].get("Add_subtitle", {})
+        
         edit_video = add_captions(
             video_path=video_path,
-            subtitle= subtitle,
-            font = "/home/rteam2/.fonts/truetype/Vazir/vazirmatn-master/fonts/ttf/Vazirmatn-Black.ttf",
-            font_size=60,
-            font_color="white",
-            stroke_width=2,
-            stroke_color="black",
-            shadow_strength=1.0,
-            shadow_blur=0.8,
-            highlight_current_word=True,
-            word_highlight_color="red",
-            position=("center", "bottom"),  
-            line_count=1,
-            padding=50,
+            subtitle=subtitle,
+            font=add_subtitle_config.get("font", "/home/rteam2/.fonts/truetype/Vazir/vazirmatn-master/fonts/ttf/Vazirmatn-Black.ttf"),
+            font_size=add_subtitle_config.get("font_size", 20),
+            font_color=add_subtitle_config.get("font_color", "white"),
+            stroke_width=add_subtitle_config.get("stroke_width", 2),
+            stroke_color=add_subtitle_config.get("stroke_color", "black"),
+            shadow_strength=add_subtitle_config.get("shadow_strength", 1.0),
+            shadow_blur=add_subtitle_config.get("shadow_blur", 0.8),
+            highlight_current_word=add_subtitle_config.get("highlight_current_word", True),
+            word_highlight_color=add_subtitle_config.get("word_highlight_color", "red"),
+            position=tuple(add_subtitle_config.get("position", ["center", "center"])),
+            line_count=add_subtitle_config.get("line_count", 1),
+            padding=add_subtitle_config.get("padding", 50),
             print_info=True,
+            
         )
     else:
         cprint("adding subtitle is disabled [SKIP [PIPELINE 3]]", "red")

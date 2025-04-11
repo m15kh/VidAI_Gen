@@ -159,7 +159,8 @@ def main(file_path, output_file=None):
 # Example usage
 if __name__ == "__main__":
     # Replace with your actual JSON file path
-    input_file = "/home/rteam2/m15kh/auto-subtitle/output/youtube/20_youtube_Motivate_me/subtitle/Cristiano_Ronaldo_Winning_Mentality__Cristiano_Ronaldo_Motivation.json"
+    input_file = "/home/rteam2/m15kh/auto-subtitle/data/43_youtube_Motivate_me/subtitle/Cristiano_Ronaldo_Winning_Mentality__Cristiano_Ronaldo_Motivation.json" 
+
     
     # Generate output file path based on input file
     base_name = os.path.splitext(os.path.basename(input_file))[0]

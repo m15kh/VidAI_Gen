@@ -1,12 +1,11 @@
-from moviepy.editor import VideoFileClip, CompositeVideoClip
+from moviepy.video.compositing.CompositeVideoClip import CompositeVideoClip
+from moviepy.video.io.VideoFileClip import VideoFileClip
+
 import subprocess
-import tempfile
 import time
 import os
-import json
 from . import segment_parser
 from SmartAITool.core import cprint
-# Add imports for Arabic text support
 import arabic_reshaper
 from bidi.algorithm import get_display
 import re
@@ -68,6 +67,7 @@ def fits_frame(line_count, font, font_size, stroke_width, frame_width):
             frame_width
         )
         return len(lines["lines"]) <= line_count
+    
     return fit_function
 
 def calculate_lines(text, font, font_size, stroke_width, frame_width):
@@ -158,19 +158,6 @@ def get_font_path(font):
 
     return font
 
-# def detect_local_whisper(print_info):
-#     try:
-#         import whisper
-#         use_local_whisper = True
-#         if print_info:
-#             print("Using local whisper model...")
-#     except ImportError:
-#         use_local_whisper = False
-#         if print_info:
-#             print("Using OpenAI Whisper API...")
-
-#     return use_local_whisper
-
 def add_captions(
     video_path,
     subtitle,
@@ -189,6 +176,7 @@ def add_captions(
     shadow_blur=0.1,
     print_info=False,
     initial_prompt=None,
+    
 ):
     _start_time = time.time()
 
@@ -288,7 +276,7 @@ def add_captions(
                     stroke_color=stroke_color,
                     stroke_width=stroke_width,
                 )
-                text = text.set_position(pos).set_start(subcaption["start"]).set_end(subcaption["end"])
+                text = text.with_position(pos).with_start(subcaption["start"]).with_end(subcaption["end"])
                 clips.append(text)
 
                 text_y_offset += line["height"]
