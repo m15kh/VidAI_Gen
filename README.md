@@ -1,6 +1,6 @@
-# Auto-Subtitle
+# VidAI-Gen
 
-A comprehensive tool for automatically generating and adding captions to videos with support for multiple languages including English, Persian, and Arabic. Perfect for content creators looking to make their videos more accessible across different language barriers.
+A comprehensive tool for **automatically downloading videos** and adding **interesting subtitles** in **Arabic, Persian, English, or any language** to videos. It can also **add a moving logo** and **create descriptions, titles, and thumbnails** for videos—**everything you need to work as a social creator! Now, all tasks are automatic, so feel free and enjoy it!**
 
 ## Features
 
@@ -27,8 +27,8 @@ A comprehensive tool for automatically generating and adding captions to videos 
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/m15kh/auto-subtitle.git
-cd auto-subtitle
+git clone https://github.com/m15kh/VidAI-Gen.git
+cd VidAI-Gen
 ```
 
 2. Install the required dependencies:

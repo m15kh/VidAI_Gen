@@ -1,9 +1,9 @@
-from moviepy.editor import *
 import yaml
 import os
 import numpy as np
 import random  # Add import for random module
-
+from moviepy.video.io.VideoFileClip import VideoFileClip
+from moviepy.video.compositing.CompositeVideoClip import CompositeVideoClip
 
 def create_shadow_text(text, fontsize, text_color, bg_color, shadow_config, size=None):
     """Create text with shadow effect"""

@@ -1,8 +1,10 @@
 #-----------------------------------MAIN-----------------------------------
-video_path: "/home/rteam2/m15kh/auto-subtitle/data/43_youtube_Motivate_me/download/Cristiano_Ronaldo_Winning_Mentality__Cristiano_Ronaldo_Motivation.mp4"
-# video_path: "https://youtube.com/shorts/kJ23zVr3HkE?si=M1O4CTvycVwbnZwR"
-
-subtitle_path: "/home/rteam2/m15kh/auto-subtitle/data/43_youtube_Motivate_me/subtitle/Cristiano_Ronaldo_Winning_Mentality__Cristiano_Ronaldo_Motivation.json" # if you want to use subtitle file, set the path
+video_path: "/home/rteam2/m15kh/auto-subtitle/output/youtube/test/video_test_2s.mp4"
+# video_path: "/home/rteam2/m15kh/auto-subtitle/output/youtube/44_youtube_CreativeFlows/download/A_good_friend_once_said_to_me_quotes_deep_love_breakup_sad_shorts.mp4"
+# video_path: "https://www.youtube.com/shorts/MAs253kCYNc?feature=share"
+# if you want to use subtitle file, set the path
+subtitle_path: "/home/rteam2/m15kh/auto-subtitle/output/youtube/subtitle/video_test_2s.json" 
+# subtitle_path: "/home/rteam2/m15kh/auto-subtitle/output/youtube/44_youtube_CreativeFlows/subtitle/A_good_friend_once_said_to_me_quotes_deep_love_breakup_sad_shorts.json"
 # subtitle_path: null
 output_dir: "output"
 debug_mode: True
@@ -35,7 +37,7 @@ youtube:
 
 #-----------------------------------subtitle-----------------------------------
 process_subtitle:
-    enabled: false
+    enabled: true
   # Whisper model options
     model: "large"  # Choices: tiny, base, small, medium, large
     # Output options
@@ -50,13 +52,13 @@ process_subtitle:
 video_editor:
 
   logo:
-    enabled: true  # Set to false to disable logo
+    enabled: false  # Set to false to disable logo
     output_video_path: /home/rteam2/m15kh/auto-subtitle/notebook/add-logo/add-logoooo.mp4
   
   subtitle:
     enabled: true  # Set to false to disable subtitle
     text: "@Max_o_Ava"
-    fontsize: 30
+    fontsize: 20
     color: "red"
     background_color: "rgba(0,0,0,0.4)"
     # movement line removed as it's now randomly selected in the script
@@ -68,10 +70,28 @@ video_editor:
       blur: 3
     effect: "pulse"  # Options: none, fade_in_out, pulse, bounce
     animation_speed: 1.0  # Speed multiplier for effects
+    
+  Add_subtitle:
+    enabled: true  # Set to false to disable adding subtitles to video
+    # font: "/home/rteam2/m15kh/auto-subtitle/fonts/cholak.ttf"
+    font: "/home/rteam2/.fonts/truetype/XBRoya/Roya/XB Roya.ttf"
+    font_size: 30
+    font_color: "white"
+    stroke_width: 1
+    stroke_color: "yellow"
+    shadow_strength: 5.0
+    shadow_blur: 0.1
+    highlight_current_word: true
+    word_highlight_color: "red"
+    position: ["center", "top"]  # [horizontal, vertical] options: left, center, right, top, bottom
+    line_count: 1
+    padding: 50
 
 #-----------------------------------GPT-----------------------------------
 gpt:
   api_key: "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"
+
+
   model: "gpt-4o"
   title:
     system_prompt: "You are a YouTube video title expert. Create attention-grabbing, SEO-friendly titles."
