@@ -3,7 +3,7 @@ import yaml
 import os
 import numpy as np
 import random  # Add import for random module
-
+from PIL import Image, ImageFilter, ImageFont
 
 def create_shadow_text(text, fontsize, text_color, bg_color, shadow_config, size=None):
     """Create text with shadow effect"""

@@ -1,8 +1,8 @@
 #-----------------------------------MAIN-----------------------------------
-video_path: "/home/rteam2/m15kh/auto-subtitle/data/43_youtube_Motivate_me/download/Cristiano_Ronaldo_Winning_Mentality__Cristiano_Ronaldo_Motivation.mp4"
+video_path: "/home/rteam2/m15kh/auto-subtitle/output/youtube/pixel/download/dead_pixel.mp4"
 # video_path: "https://youtube.com/shorts/kJ23zVr3HkE?si=M1O4CTvycVwbnZwR"
 
-subtitle_path: "/home/rteam2/m15kh/auto-subtitle/data/43_youtube_Motivate_me/subtitle/Cristiano_Ronaldo_Winning_Mentality__Cristiano_Ronaldo_Motivation.json" # if you want to use subtitle file, set the path
+subtitle_path: "/home/rteam2/m15kh/auto-subtitle/output/youtube/pixel/subtitle/dead_pixel.json" # if you want to use subtitle file, set the path
 # subtitle_path: null
 output_dir: "output"
 debug_mode: True
@@ -35,7 +35,7 @@ youtube:
 
 #-----------------------------------subtitle-----------------------------------
 process_subtitle:
-    enabled: false
+    enabled: True
   # Whisper model options
     model: "large"  # Choices: tiny, base, small, medium, large
     # Output options
@@ -50,11 +50,11 @@ process_subtitle:
 video_editor:
 
   logo:
-    enabled: true  # Set to false to disable logo
+    enabled: True  # Set to false to disable logo
     output_video_path: /home/rteam2/m15kh/auto-subtitle/notebook/add-logo/add-logoooo.mp4
   
   subtitle:
-    enabled: true  # Set to false to disable subtitle
+    enabled: false  # Set to false to disable subtitle
     text: "@Max_o_Ava"
     fontsize: 30
     color: "red"

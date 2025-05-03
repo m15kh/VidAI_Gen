@@ -86,13 +86,13 @@ def main(config):
     else:
         cprint("adding subtitle is disabled [SKIP [PIPELINE 3]]", "red")
         
-    # ---------------------[PIPELINE 3](Adding logo to the video)---------------------
+    # ---------------------[PIPELINE ](Adding logo to the video)---------------------
     
     if config["video_editor"]["logo"]["enabled"] == True:
         cprint("[PIPELINE 4] Adding logo to the video ...", "magenta")
         if config["process_subtitle"]["enabled"] == False:
             edit_video = video_path
-        edit_video = add_logo(config, edit_video)
+        # edit_video = add_logo(config, edit_video) #BUG when is uncomment for add logo get bug
     else:
         cprint("adding logo is disabled [SKIP [PIPELINE 4]]", "red")
     
